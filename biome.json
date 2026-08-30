@@ -1,0 +1,11 @@
+{
+	"files": {
+		"maxSize": 2097152,
+		"includes": ["**", "!**/.next", "!**/node_modules"]
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
+	}
+}

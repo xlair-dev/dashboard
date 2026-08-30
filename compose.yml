@@ -1,0 +1,12 @@
+services:
+  app:
+    image: ghcr.io/xlair-dev/xlair-dashboard:latest
+    container_name: xlair-dashboard
+    ports:
+      - "${HOST_PORT:-3000}:3000"
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"
+    restart: unless-stopped

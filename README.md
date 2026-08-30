@@ -1,6 +1,6 @@
-# xlair Dashboard
+# XLAIR Dashboard
 
-xlair の管理者用ダッシュボードです。
+XLAIR の管理者用ダッシュボードです。
 
 ## Development
 
