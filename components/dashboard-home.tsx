@@ -10,7 +10,7 @@ import TopNavigation from "@cloudscape-design/components/top-navigation";
 
 export default function DashboardHome() {
 	return (
-		<>
+		<div className="min-h-screen min-w-80">
 			<TopNavigation
 				id="dashboard-header"
 				identity={{ href: "/", title: "XLAIR Dashboard" }}
@@ -28,6 +28,6 @@ export default function DashboardHome() {
 					</ContentLayout>
 				}
 			/>
-		</>
+		</div>
 	);
 }
