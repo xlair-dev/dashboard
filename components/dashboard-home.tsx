@@ -8,7 +8,7 @@ import Header from "@cloudscape-design/components/header";
 import SpaceBetween from "@cloudscape-design/components/space-between";
 import TopNavigation from "@cloudscape-design/components/top-navigation";
 
-export default function DashboardHome() {
+export default function DashboardHome({ userName }: { userName: string }) {
 	return (
 		<div className="min-h-screen min-w-80">
 			<TopNavigation
@@ -23,8 +23,8 @@ export default function DashboardHome() {
 					<ContentLayout header={<Header variant="h1">XLAIR Dashboard</Header>}>
 						<Container>
 							<SpaceBetween size="m">
-								<div>管理者用ダッシュボードへようこそ。</div>
-								<Button disabled>ログイン機能を準備中</Button>
+								<div>管理者用ダッシュボードへようこそ、{userName} さん。</div>
+								<Button href="/auth/logout">ログアウト</Button>
 							</SpaceBetween>
 						</Container>
 					</ContentLayout>
