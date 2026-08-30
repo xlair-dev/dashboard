@@ -17,6 +17,8 @@ export default function DashboardHome() {
 			/>
 			<AppLayout
 				headerSelector="#dashboard-header"
+				// Remove toolsHide when an AppLayout tools panel is introduced.
+				toolsHide
 				content={
 					<ContentLayout header={<Header variant="h1">XLAIR Dashboard</Header>}>
 						<Container>
