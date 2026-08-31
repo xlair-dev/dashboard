@@ -3,8 +3,25 @@ name: Lint and Format
 on:
   push:
     branches: [main]
+    paths:
+      - ".github/workflows/lint-and-format.yml"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.css"
+      - "**/*.mjs"
+      - "**/*.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
   pull_request:
-    branches: [main]
+    paths:
+      - ".github/workflows/lint-and-format.yml"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.css"
+      - "**/*.mjs"
+      - "**/*.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
 
 jobs:
   lint-and-format:
