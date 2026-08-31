@@ -32,7 +32,8 @@ export type MusicListResponse = {
 export async function fetchMusics(
 	searchParams: { cursor?: string; limit?: number } = {},
 ): Promise<MusicListResponse> {
-	const accessToken = await auth0.getAccessToken();
+	const audience = process.env.AUTH0_AUDIENCE ?? "https://api.xlair.dev";
+	const accessToken = await auth0.getAccessToken({ audience });
 	const params = new URLSearchParams();
 	if (searchParams.cursor) params.set("cursor", searchParams.cursor);
 	if (searchParams.limit) params.set("limit", String(searchParams.limit));
