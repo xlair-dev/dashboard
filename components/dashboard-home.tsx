@@ -24,6 +24,7 @@ export default function DashboardHome({ userName }: { userName: string }) {
 						<Container>
 							<SpaceBetween size="m">
 								<div>管理者用ダッシュボードへようこそ、{userName} さん。</div>
+								<Button href="/musics">楽曲管理</Button>
 								<Button href="/auth/logout">ログアウト</Button>
 							</SpaceBetween>
 						</Container>
