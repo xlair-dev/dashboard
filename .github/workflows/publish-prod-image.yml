@@ -3,6 +3,19 @@ name: Docker Build and Publish
 on:
   push:
     branches: [main]
+    paths:
+      - ".dockerignore"
+      - ".github/workflows/publish-prod-image.yml"
+      - "Dockerfile"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.css"
+      - "**/*.mjs"
+      - "**/*.json"
+      - "public/**"
+      - "!test/**"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
   workflow_dispatch:
 
 env:
