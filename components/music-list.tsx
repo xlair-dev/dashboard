@@ -6,10 +6,14 @@ import Container from "@cloudscape-design/components/container";
 import ContentLayout from "@cloudscape-design/components/content-layout";
 import Header from "@cloudscape-design/components/header";
 import SpaceBetween from "@cloudscape-design/components/space-between";
-import Table from "@cloudscape-design/components/table";
 import TopNavigation from "@cloudscape-design/components/top-navigation";
+import dynamic from "next/dynamic";
 
 import type { MusicListResponse } from "@/lib/api";
+
+const MusicTable = dynamic(() => import("@/components/music-table"), {
+	ssr: false,
+});
 
 export default function MusicList({
 	data,
@@ -45,29 +49,7 @@ export default function MusicList({
 					>
 						<Container>
 							<SpaceBetween size="m">
-								<Table
-									columnDefinitions={[
-										{ header: "タイトル", cell: (item) => item.music.title },
-										{
-											header: "アーティスト",
-											cell: (item) => item.music.artist,
-										},
-										{ header: "BPM", cell: (item) => item.music.bpm },
-										{ header: "譜面", cell: (item) => item.sheets.length },
-										{
-											header: "登録日時",
-											cell: (item) =>
-												new Date(item.music.registrationDate).toLocaleString(
-													"ja-JP",
-												),
-										},
-									]}
-									items={data.items}
-									header={
-										<Header counter={`(${data.items.length})`}>楽曲一覧</Header>
-									}
-									empty={<span>楽曲がありません。</span>}
-								/>
+								<MusicTable data={data} />
 								<div className="flex justify-end">
 									<Button disabled={!nextPageHref} href={nextPageHref}>
 										次へ
