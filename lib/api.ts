@@ -35,6 +35,33 @@ export type MusicListResponse = {
 	nextCursor: string | null;
 };
 
+export type MusicFields = {
+	title: string;
+	artist: string;
+	bpm: number;
+	genre: "ORIGINAL";
+	jacket: string;
+	registrationDate: string;
+	isTest: boolean;
+};
+
+export type CreateMusicInput = MusicFields & {
+	sheets: Array<{
+		difficulty: Sheet["difficulty"];
+		level: number;
+		notesDesigner: string;
+	}>;
+};
+
+export type UpdateMusicInput = MusicFields & {
+	sheets: Array<{
+		id: string;
+		difficulty: Sheet["difficulty"];
+		level: number;
+		notesDesigner: string;
+	}>;
+};
+
 async function getAccessToken(returnTo: string) {
 	const audience = process.env.AUTH0_AUDIENCE ?? "https://api.xlair.dev";
 	try {
@@ -97,4 +124,43 @@ export async function fetchMusic(musicId: string): Promise<MusicWithSheets> {
 	}
 
 	return response.json() as Promise<MusicWithSheets>;
+}
+
+async function writeMusic(
+	path: string,
+	method: "POST",
+	body: CreateMusicInput | UpdateMusicInput,
+	returnTo: string,
+): Promise<MusicWithSheets> {
+	const accessToken = await getAccessToken(returnTo);
+	const response = await fetch(`${process.env.API_BASE_URL}${path}`, {
+		method,
+		headers: {
+			Authorization: `Bearer ${accessToken.token}`,
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(body),
+		cache: "no-store",
+	});
+
+	if (!response.ok) {
+		throw new Error(
+			`Failed to ${method === "POST" ? "create" : "update"} music: ${response.status}`,
+		);
+	}
+
+	return response.json() as Promise<MusicWithSheets>;
+}
+
+export function createMusic(input: CreateMusicInput) {
+	return writeMusic("/admin/musics", "POST", input, "/musics/new");
+}
+
+export function updateMusic(musicId: string, input: UpdateMusicInput) {
+	return writeMusic(
+		`/admin/musics/${encodeURIComponent(musicId)}`,
+		"POST",
+		input,
+		`/musics/${musicId}/edit`,
+	);
 }
