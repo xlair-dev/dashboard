@@ -41,6 +41,7 @@ export type MusicFields = {
 	bpm: number;
 	genre: "ORIGINAL";
 	jacket: string;
+	registrationDate: string;
 	isTest: boolean;
 };
 

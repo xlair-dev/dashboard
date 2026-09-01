@@ -26,6 +26,7 @@ type FormValues = {
 	artist: string;
 	bpm: string;
 	jacket: string;
+	registrationDate: string;
 	isTest: boolean;
 	sheets: Record<Difficulty, SheetDraft>;
 };
@@ -59,6 +60,7 @@ function initialValues(data?: MusicWithSheets): FormValues {
 		artist: data?.music.artist ?? "",
 		bpm: data ? String(data.music.bpm) : "",
 		jacket: data?.music.jacket ?? "",
+		registrationDate: data?.music.registrationDate.slice(0, 10) ?? "",
 		isTest: data?.music.isTest ?? false,
 		sheets,
 	};
@@ -91,6 +93,11 @@ export default function MusicForm({
 			nextErrors.artist = "アーティストを入力してください。";
 		if (!values.jacket.trim())
 			nextErrors.jacket = "ジャケットを入力してください。";
+		if (!values.registrationDate)
+			nextErrors.registrationDate = "登録日を入力してください。";
+		else if (!/^\d{4}-\d{2}-\d{2}$/.test(values.registrationDate))
+			nextErrors.registrationDate =
+				"登録日は YYYY-MM-DD 形式で入力してください。";
 		if (!isPositiveSingleDecimal(values.bpm))
 			nextErrors.bpm = "BPM は正の数値（小数第1位まで）で入力してください。";
 		for (const { key, label } of difficulties) {
@@ -121,6 +128,7 @@ export default function MusicForm({
 				bpm: Number(values.bpm),
 				genre: "ORIGINAL" as const,
 				jacket: values.jacket.trim(),
+				registrationDate: `${values.registrationDate}T00:00:00.000Z`,
 				isTest: values.isTest,
 			};
 			const result = data
@@ -226,6 +234,19 @@ export default function MusicForm({
 											value={values.jacket}
 											onChange={({ detail }) =>
 												updateValue("jacket", detail.value)
+											}
+										/>
+									</FormField>
+									<FormField
+										label="登録日"
+										description="運用上の楽曲登録日"
+										errorText={errors.registrationDate}
+									>
+										<Input
+											value={values.registrationDate}
+											placeholder="YYYY-MM-DD"
+											onChange={({ detail }) =>
+												updateValue("registrationDate", detail.value)
 											}
 										/>
 									</FormField>
