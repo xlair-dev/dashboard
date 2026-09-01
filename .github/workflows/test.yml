@@ -3,7 +3,23 @@ name: Test
 on:
   push:
     branches: [main]
+    paths:
+      - ".github/workflows/test.yml"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.mjs"
+      - "**/*.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
   pull_request:
+    paths:
+      - ".github/workflows/test.yml"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.mjs"
+      - "**/*.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
 
 jobs:
   test:
