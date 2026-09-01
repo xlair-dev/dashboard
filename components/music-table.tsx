@@ -1,6 +1,7 @@
 "use client";
 
 import Header from "@cloudscape-design/components/header";
+import Link from "@cloudscape-design/components/link";
 import Table from "@cloudscape-design/components/table";
 
 import type { MusicListResponse } from "@/lib/api";
@@ -9,7 +10,14 @@ export default function MusicTable({ data }: { data: MusicListResponse }) {
 	return (
 		<Table
 			columnDefinitions={[
-				{ header: "タイトル", cell: (item) => item.music.title },
+				{
+					header: "タイトル",
+					cell: (item) => (
+						<Link href={`/musics/${encodeURIComponent(item.music.id)}`}>
+							{item.music.title}
+						</Link>
+					),
+				},
 				{
 					header: "アーティスト",
 					cell: (item) => item.music.artist,
