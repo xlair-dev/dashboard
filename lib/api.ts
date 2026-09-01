@@ -128,7 +128,7 @@ export async function fetchMusic(musicId: string): Promise<MusicWithSheets> {
 
 async function writeMusic(
 	path: string,
-	method: "POST" | "PUT",
+	method: "POST",
 	body: CreateMusicInput | UpdateMusicInput,
 	returnTo: string,
 ): Promise<MusicWithSheets> {
@@ -159,7 +159,7 @@ export function createMusic(input: CreateMusicInput) {
 export function updateMusic(musicId: string, input: UpdateMusicInput) {
 	return writeMusic(
 		`/admin/musics/${encodeURIComponent(musicId)}`,
-		"PUT",
+		"POST",
 		input,
 		`/musics/${musicId}/edit`,
 	);
