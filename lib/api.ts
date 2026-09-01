@@ -1,3 +1,9 @@
+import {
+	AccessTokenError,
+	AccessTokenErrorCode,
+} from "@auth0/nextjs-auth0/errors";
+import { redirect } from "next/navigation";
+
 import { auth0 } from "@/lib/auth0";
 
 export type Sheet = {
@@ -33,10 +39,31 @@ export async function fetchMusics(
 	searchParams: { cursor?: string; limit?: number } = {},
 ): Promise<MusicListResponse> {
 	const audience = process.env.AUTH0_AUDIENCE ?? "https://api.xlair.dev";
-	const accessToken = await auth0.getAccessToken({ audience });
 	const params = new URLSearchParams();
 	if (searchParams.cursor) params.set("cursor", searchParams.cursor);
 	if (searchParams.limit) params.set("limit", String(searchParams.limit));
+	const returnTo = `/musics${params.size ? `?${params.toString()}` : ""}`;
+
+	let accessToken: Awaited<ReturnType<typeof auth0.getAccessToken>>;
+	try {
+		accessToken = await auth0.getAccessToken({ audience });
+	} catch (error) {
+		if (
+			error instanceof AccessTokenError &&
+			[
+				AccessTokenErrorCode.MISSING_REFRESH_TOKEN,
+				AccessTokenErrorCode.FAILED_TO_REFRESH_TOKEN,
+				AccessTokenErrorCode.SESSION_EXPIRED,
+			].includes(error.code as AccessTokenErrorCode)
+		) {
+			const loginParams = new URLSearchParams({
+				prompt: "login",
+				returnTo,
+			});
+			redirect(`/auth/login?${loginParams.toString()}`);
+		}
+		throw error;
+	}
 
 	const response = await fetch(
 		`${process.env.API_BASE_URL}/admin/musics?${params.toString()}`,
