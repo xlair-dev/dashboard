@@ -16,7 +16,10 @@ export default function MusicListLoading() {
 					<div aria-label="楽曲一覧を読み込み中" role="status">
 						<SpaceBetween size="s">
 							{skeletonRows.map((row) => (
-								<div className="grid grid-cols-5 gap-4" key={row}>
+								<div
+									className="grid grid-cols-2 gap-2 sm:grid-cols-5 sm:gap-4"
+									key={row}
+								>
 									<Skeleton />
 									<Skeleton />
 									<Skeleton width="4rem" />
