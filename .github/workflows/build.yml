@@ -3,7 +3,29 @@ name: Build
 on:
   push:
     branches: [main]
+    paths:
+      - ".github/workflows/build.yml"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.css"
+      - "**/*.mjs"
+      - "**/*.json"
+      - "public/**"
+      - "!test/**"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
   pull_request:
+    paths:
+      - ".github/workflows/build.yml"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.css"
+      - "**/*.mjs"
+      - "**/*.json"
+      - "public/**"
+      - "!test/**"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
 
 jobs:
   build:
