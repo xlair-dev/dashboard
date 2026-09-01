@@ -30,7 +30,20 @@ export default function MusicList({
 
 	return (
 		<DashboardLayout activeHref="/musics">
-			<ContentLayout header={<Header variant="h1">楽曲管理</Header>}>
+			<ContentLayout
+				header={
+					<Header
+						variant="h1"
+						actions={
+							<Button variant="primary" href="/musics/new">
+								楽曲を追加
+							</Button>
+						}
+					>
+						楽曲管理
+					</Header>
+				}
+			>
 				<Container>
 					<SpaceBetween size="m">
 						<MusicTable data={data} />

@@ -32,7 +32,12 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 				header={
 					<Header
 						variant="h1"
-						actions={<Button href="/musics">楽曲一覧に戻る</Button>}
+						actions={
+							<SpaceBetween direction="horizontal" size="s">
+								<Button href={`/musics/${music.id}/edit`}>編集</Button>
+								<Button href="/musics">楽曲一覧に戻る</Button>
+							</SpaceBetween>
+						}
 					>
 						{music.title}
 					</Header>
