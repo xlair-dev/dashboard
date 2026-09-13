@@ -9,6 +9,8 @@ import Image from "next/image";
 import type { MusicListResponse } from "@/lib/api";
 
 export default function MusicTable({ data }: { data: MusicListResponse }) {
+	const eagerJacketMusicId = data.items[0]?.music.id;
+
 	return (
 		<Table
 			className="px-4 sm:px-6"
@@ -24,6 +26,9 @@ export default function MusicTable({ data }: { data: MusicListResponse }) {
 								alt={`${item.music.title} のジャケット`}
 								width={48}
 								height={48}
+								loading={
+									item.music.id === eagerJacketMusicId ? "eager" : "lazy"
+								}
 								className="size-12 object-cover"
 								unoptimized
 							/>
