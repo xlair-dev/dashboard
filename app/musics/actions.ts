@@ -16,11 +16,8 @@ export async function createMusicAction(
 	return createMusic(input);
 }
 
-export async function uploadJacketAction(
-	musicId: string | undefined,
-	file: File,
-) {
-	return uploadJacket(musicId, file);
+export async function uploadJacketAction(file: File) {
+	return uploadJacket(file);
 }
 
 export async function deleteJacketAction(

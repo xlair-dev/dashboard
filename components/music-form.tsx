@@ -137,10 +137,7 @@ export default function MusicForm({
 		try {
 			let jacket = values.jacket.trim();
 			if (jacketFile[0]) {
-				uploadedJacket = await uploadJacketAction(
-					data?.music.id,
-					jacketFile[0],
-				);
+				uploadedJacket = await uploadJacketAction(jacketFile[0]);
 				jacket = uploadedJacket.jacketUrl;
 			}
 			const fields = {

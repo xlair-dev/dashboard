@@ -63,17 +63,13 @@ export type UpdateMusicInput = MusicFields & {
 };
 
 type JacketUploadResponse = {
-	uploadId: string;
-	uploadUrl: string;
+	jacketId: string;
 	jacketUrl: string;
-	cleanupToken: string;
 };
 
 export type UploadedJacket = {
-	uploadId: string;
+	jacketId: string;
 	jacketUrl: string;
-	contentType: string;
-	cleanupToken: string;
 };
 
 async function getAccessToken(returnTo: string) {
@@ -179,10 +175,7 @@ export function updateMusic(musicId: string, input: UpdateMusicInput) {
 	);
 }
 
-export async function uploadJacket(
-	musicId: string | undefined,
-	file: File,
-): Promise<UploadedJacket> {
+export async function uploadJacket(file: File): Promise<UploadedJacket> {
 	if (
 		!(["image/jpeg", "image/png", "image/webp"] as string[]).includes(file.type)
 	)
@@ -191,82 +184,27 @@ export async function uploadJacket(
 		);
 	if (file.size > 5 * 1024 * 1024)
 		throw new Error("ジャケット画像は 5 MiB 以下にしてください。");
-	const accessToken = await getAccessToken(
-		musicId ? `/musics/${musicId}/edit` : "/musics/new",
-	);
-	const response = await fetch(
-		`${process.env.API_BASE_URL}/admin/jackets/upload-url`,
-		{
-			method: "POST",
-			headers: {
-				Authorization: `Bearer ${accessToken.token}`,
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ contentType: file.type }),
-			cache: "no-store",
-		},
-	);
+	const accessToken = await getAccessToken("/musics");
+	const formData = new FormData();
+	formData.append("file", file);
+	const response = await fetch(`${process.env.API_BASE_URL}/admin/jackets`, {
+		method: "POST",
+		headers: { Authorization: `Bearer ${accessToken.token}` },
+		body: formData,
+		cache: "no-store",
+	});
 	if (!response.ok)
-		throw new Error(`Failed to create jacket upload URL: ${response.status}`);
-	const upload = (await response.json()) as JacketUploadResponse;
-	const uploaded: UploadedJacket = {
-		uploadId: upload.uploadId,
-		jacketUrl: upload.jacketUrl,
-		contentType: file.type,
-		cleanupToken: upload.cleanupToken,
-	};
-	try {
-		const uploadResponse = await fetch(upload.uploadUrl, {
-			method: "PUT",
-			headers: { "Content-Type": file.type },
-			body: await file.arrayBuffer(),
-		});
-		if (!uploadResponse.ok)
-			throw new Error(`Failed to upload jacket: ${uploadResponse.status}`);
-		const finalizeResponse = await fetch(
-			`${process.env.API_BASE_URL}/admin/jackets/${encodeURIComponent(upload.uploadId)}/finalize`,
-			{
-				method: "POST",
-				headers: {
-					Authorization: `Bearer ${accessToken.token}`,
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					contentType: file.type,
-					cleanupToken: uploaded.cleanupToken,
-				}),
-				cache: "no-store",
-			},
-		);
-		if (!finalizeResponse.ok)
-			throw new Error(
-				`Failed to finalize jacket upload: ${finalizeResponse.status}`,
-			);
-		return uploaded;
-	} catch (error) {
-		try {
-			await deleteJacket(uploaded);
-		} catch {
-			// Cleanup is best effort after an upload failure.
-		}
-		throw error;
-	}
+		throw new Error(`Failed to upload jacket: ${response.status}`);
+	return (await response.json()) as JacketUploadResponse;
 }
 
 export async function deleteJacket(upload: UploadedJacket) {
 	const accessToken = await getAccessToken("/musics");
 	const response = await fetch(
-		`${process.env.API_BASE_URL}/admin/jackets/${encodeURIComponent(upload.uploadId)}`,
+		`${process.env.API_BASE_URL}/admin/jackets/${encodeURIComponent(upload.jacketId)}`,
 		{
 			method: "DELETE",
-			headers: {
-				Authorization: `Bearer ${accessToken.token}`,
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				contentType: upload.contentType,
-				cleanupToken: upload.cleanupToken,
-			}),
+			headers: { Authorization: `Bearer ${accessToken.token}` },
 			cache: "no-store",
 		},
 	);
