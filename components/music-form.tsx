@@ -11,6 +11,7 @@ import Form from "@cloudscape-design/components/form";
 import FormField from "@cloudscape-design/components/form-field";
 import Header from "@cloudscape-design/components/header";
 import Input from "@cloudscape-design/components/input";
+import Select from "@cloudscape-design/components/select";
 import SpaceBetween from "@cloudscape-design/components/space-between";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -25,6 +26,7 @@ import DashboardLayout from "@/components/dashboard-layout";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
 import type {
 	CreateMusicInput,
+	Genre,
 	MusicWithSheets,
 	UpdateMusicInput,
 } from "@/lib/api";
@@ -35,6 +37,7 @@ type FormValues = {
 	title: string;
 	artist: string;
 	bpm: string;
+	genre: Genre;
 	jacket: string | null;
 	registrationDate: string;
 	isTest: boolean;
@@ -45,6 +48,12 @@ const difficulties: Array<{ key: Difficulty; label: string }> = [
 	{ key: "basic", label: "Basic" },
 	{ key: "advanced", label: "Advanced" },
 	{ key: "master", label: "Master" },
+];
+
+const genres: Array<{ value: Genre; label: string }> = [
+	{ value: "ORIGINAL", label: "ORIGINAL" },
+	{ value: "EXTERNAL", label: "EXTERNAL" },
+	{ value: "OTHER", label: "OTHER" },
 ];
 
 function isPositiveSingleDecimal(value: string) {
@@ -69,6 +78,7 @@ function initialValues(data?: MusicWithSheets): FormValues {
 		title: data?.music.title ?? "",
 		artist: data?.music.artist ?? "",
 		bpm: data ? String(data.music.bpm) : "",
+		genre: data?.music.genre ?? "ORIGINAL",
 		jacket: data?.music.jacket || null,
 		registrationDate: data?.music.registrationDate.slice(0, 10) ?? "",
 		isTest: data?.music.isTest ?? false,
@@ -147,7 +157,7 @@ export default function MusicForm({
 				title: values.title.trim(),
 				artist: values.artist.trim(),
 				bpm: Number(values.bpm),
-				genre: "ORIGINAL" as const,
+				genre: values.genre,
 				registrationDate: `${values.registrationDate}T00:00:00.000Z`,
 				isTest: values.isTest,
 			};
@@ -270,11 +280,20 @@ export default function MusicForm({
 											}
 										/>
 									</FormField>
-									<FormField
-										label="ジャンル"
-										description="現在は ORIGINAL 固定です。"
-									>
-										<Input value="ORIGINAL" disabled />
+									<FormField label="ジャンル">
+										<Select
+											selectedOption={
+												genres.find(({ value }) => value === values.genre) ??
+												genres[0]
+											}
+											onChange={({ detail }) =>
+												updateValue(
+													"genre",
+													detail.selectedOption.value ?? "ORIGINAL",
+												)
+											}
+											options={genres}
+										/>
 									</FormField>
 									<FormField label="ジャケット" errorText={errors.jacket}>
 										<SpaceBetween size="s">

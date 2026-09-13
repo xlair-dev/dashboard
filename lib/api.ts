@@ -13,12 +13,13 @@ export type Sheet = {
 	level: number;
 	notesDesigner: string;
 };
+export type Genre = "ORIGINAL" | "EXTERNAL" | "OTHER";
 export type Music = {
 	id: string;
 	title: string;
 	artist: string;
 	bpm: number;
-	genre: string;
+	genre: Genre;
 	jacket: string | null;
 	registrationDate: string;
 	isTest: boolean;
@@ -32,7 +33,7 @@ export type MusicFields = {
 	title: string;
 	artist: string;
 	bpm: number;
-	genre: "ORIGINAL";
+	genre: Genre;
 	registrationDate: string;
 	isTest: boolean;
 };
