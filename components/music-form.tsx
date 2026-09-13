@@ -153,7 +153,7 @@ export default function MusicForm({
 					})),
 				} satisfies CreateMusicInput);
 			}
-			router.push("/musics");
+			router.push(data ? `/musics/${data.music.id}` : "/musics");
 		} catch (error) {
 			setSubmitError(
 				error instanceof Error ? error.message : "保存に失敗しました。",
