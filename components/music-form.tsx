@@ -15,7 +15,7 @@ import Select from "@cloudscape-design/components/select";
 import SpaceBetween from "@cloudscape-design/components/space-between";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
 	createMusicAction,
@@ -38,7 +38,7 @@ type FormValues = {
 	artist: string;
 	bpm: string;
 	genre: Genre;
-	jacket: string;
+	jacket: string | null;
 	registrationDate: string;
 	isTest: boolean;
 	sheets: Record<Difficulty, SheetDraft>;
@@ -79,7 +79,7 @@ function initialValues(data?: MusicWithSheets): FormValues {
 		artist: data?.music.artist ?? "",
 		bpm: data ? String(data.music.bpm) : "",
 		genre: data?.music.genre ?? "ORIGINAL",
-		jacket: data?.music.jacket ?? "",
+		jacket: data?.music.jacket || null,
 		registrationDate: data?.music.registrationDate.slice(0, 10) ?? "",
 		isTest: data?.music.isTest ?? false,
 		sheets,
@@ -99,7 +99,20 @@ export default function MusicForm({
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isDeletingJacket, setIsDeletingJacket] = useState(false);
 	const [jacketFile, setJacketFile] = useState<File[]>([]);
+	const [jacketPreviewUrl, setJacketPreviewUrl] = useState<string>();
 	const router = useRouter();
+
+	useEffect(() => {
+		const file = jacketFile[0];
+		if (!file) {
+			setJacketPreviewUrl(undefined);
+			return;
+		}
+
+		const url = URL.createObjectURL(file);
+		setJacketPreviewUrl(url);
+		return () => URL.revokeObjectURL(url);
+	}, [jacketFile]);
 
 	const isEdit = Boolean(data);
 	const updateValue = (
@@ -191,7 +204,7 @@ export default function MusicForm({
 		setIsDeletingJacket(true);
 		try {
 			await deleteJacketAction(data.music.id);
-			setValues((current) => ({ ...current, jacket: "" }));
+			setValues((current) => ({ ...current, jacket: null }));
 			setJacketFile([]);
 		} catch (error) {
 			setSubmitError(
@@ -203,6 +216,8 @@ export default function MusicForm({
 			setIsDeletingJacket(false);
 		}
 	}
+
+	const previewUrl = jacketPreviewUrl ?? values.jacket;
 
 	return (
 		<DashboardLayout activeHref="/musics">
@@ -284,7 +299,6 @@ export default function MusicForm({
 										<SpaceBetween size="s">
 											<FileUpload
 												accept="image/jpeg,image/png,image/webp"
-												showFileThumbnail
 												value={jacketFile}
 												onChange={({ detail }) => setJacketFile(detail.value)}
 												i18nStrings={{
@@ -293,17 +307,18 @@ export default function MusicForm({
 													removeFileAriaLabel: () => "画像を削除",
 												}}
 											/>
-											{values.jacket ? (
+											{previewUrl ? (
 												<SpaceBetween size="s">
 													<Image
-														src={values.jacket}
+														src={previewUrl}
 														alt="ジャケットプレビュー"
 														width={128}
 														height={128}
+														loading="eager"
 														className="size-32 object-cover"
 														unoptimized
 													/>
-													{data ? (
+													{data && !jacketPreviewUrl ? (
 														<Button
 															loading={isDeletingJacket}
 															disabled={isSubmitting || isDeletingJacket}
