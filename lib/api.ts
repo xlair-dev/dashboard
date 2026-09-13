@@ -19,7 +19,7 @@ export type Music = {
 	artist: string;
 	bpm: number;
 	genre: string;
-	jacket: string;
+	jacket: string | null;
 	registrationDate: string;
 	isTest: boolean;
 };
@@ -113,17 +113,41 @@ async function writeMusic(
 	returnTo: string,
 ): Promise<MusicWithSheets> {
 	const accessToken = await getAccessToken(returnTo);
-	const formData = new FormData();
-	formData.append("metadata", JSON.stringify(body));
-	if (jacket) formData.append("jacket", jacket);
 	const response = await fetch(`${process.env.API_BASE_URL}${path}`, {
 		method: "POST",
-		headers: { Authorization: `Bearer ${accessToken.token}` },
-		body: formData,
+		headers: {
+			Authorization: `Bearer ${accessToken.token}`,
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(body),
 		cache: "no-store",
 	});
 	if (!response.ok)
 		throw new Error(`Failed to write music: ${response.status}`);
+	const music = (await response.json()) as MusicWithSheets;
+	if (!jacket) return music;
+	return uploadJacket(music.music.id, jacket, returnTo);
+}
+
+async function uploadJacket(
+	musicId: string,
+	jacket: File,
+	returnTo: string,
+): Promise<MusicWithSheets> {
+	const accessToken = await getAccessToken(returnTo);
+	const formData = new FormData();
+	formData.append("jacket", jacket);
+	const response = await fetch(
+		`${process.env.API_BASE_URL}/admin/musics/${encodeURIComponent(musicId)}/jacket`,
+		{
+			method: "POST",
+			headers: { Authorization: `Bearer ${accessToken.token}` },
+			body: formData,
+			cache: "no-store",
+		},
+	);
+	if (!response.ok)
+		throw new Error(`Failed to upload jacket: ${response.status}`);
 	return response.json() as Promise<MusicWithSheets>;
 }
 

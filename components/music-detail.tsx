@@ -70,14 +70,18 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 							<DetailItem
 								label="ジャケット"
 								value={
-									<Image
-										src={music.jacket}
-										alt={`${music.title} のジャケット`}
-										width={192}
-										height={192}
-										className="size-48 object-cover"
-										unoptimized
-									/>
+									music.jacket ? (
+										<Image
+											src={music.jacket}
+											alt={`${music.title} のジャケット`}
+											width={192}
+											height={192}
+											className="size-48 object-cover"
+											unoptimized
+										/>
+									) : (
+										"未設定"
+									)
 								}
 							/>
 							<DetailItem

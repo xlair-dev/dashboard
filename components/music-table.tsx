@@ -17,16 +17,19 @@ export default function MusicTable({ data }: { data: MusicListResponse }) {
 			columnDefinitions={[
 				{
 					header: "ジャケット",
-					cell: (item) => (
-						<Image
-							src={item.music.jacket}
-							alt={`${item.music.title} のジャケット`}
-							width={48}
-							height={48}
-							className="size-12 object-cover"
-							unoptimized
-						/>
-					),
+					cell: (item) =>
+						item.music.jacket ? (
+							<Image
+								src={item.music.jacket}
+								alt={`${item.music.title} のジャケット`}
+								width={48}
+								height={48}
+								className="size-12 object-cover"
+								unoptimized
+							/>
+						) : (
+							<span>未設定</span>
+						),
 				},
 				{
 					header: "タイトル",
