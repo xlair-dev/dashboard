@@ -33,7 +33,6 @@ export type MusicFields = {
 	artist: string;
 	bpm: number;
 	genre: "ORIGINAL";
-	jacket: string;
 	registrationDate: string;
 	isTest: boolean;
 };
@@ -115,8 +114,7 @@ async function writeMusic(
 ): Promise<MusicWithSheets> {
 	const accessToken = await getAccessToken(returnTo);
 	const formData = new FormData();
-	const { jacket: _jacketUrl, ...metadata } = body;
-	formData.append("metadata", JSON.stringify(metadata));
+	formData.append("metadata", JSON.stringify(body));
 	if (jacket) formData.append("jacket", jacket);
 	const response = await fetch(`${process.env.API_BASE_URL}${path}`, {
 		method: "POST",
