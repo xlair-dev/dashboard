@@ -132,7 +132,6 @@ export default function MusicForm({
 				artist: values.artist.trim(),
 				bpm: Number(values.bpm),
 				genre: "ORIGINAL" as const,
-				jacket: values.jacket.trim(),
 				registrationDate: `${values.registrationDate}T00:00:00.000Z`,
 				isTest: values.isTest,
 			};
