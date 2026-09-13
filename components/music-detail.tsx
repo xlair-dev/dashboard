@@ -8,6 +8,7 @@ import SpaceBetween from "@cloudscape-design/components/space-between";
 import dynamic from "next/dynamic";
 
 import DashboardLayout from "@/components/dashboard-layout";
+import MusicBreadcrumbs from "@/components/music-breadcrumbs";
 import type { MusicWithSheets } from "@/lib/api";
 
 const MusicSheetsTable = dynamic(
@@ -32,15 +33,16 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 				header={
 					<Header
 						variant="h1"
-						actions={
-							<SpaceBetween direction="horizontal" size="s">
-								<Button href={`/musics/${music.id}/edit`}>編集</Button>
-								<Button href="/musics">楽曲一覧に戻る</Button>
-							</SpaceBetween>
-						}
+						actions={<Button href={`/musics/${music.id}/edit`}>編集</Button>}
 					>
 						{music.title}
 					</Header>
+				}
+				breadcrumbs={
+					<MusicBreadcrumbs
+						current={music.title}
+						currentHref={`/musics/${encodeURIComponent(music.id)}`}
+					/>
 				}
 			>
 				<SpaceBetween size="l">

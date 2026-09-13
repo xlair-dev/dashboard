@@ -5,14 +5,18 @@ import Button from "@cloudscape-design/components/button";
 import Checkbox from "@cloudscape-design/components/checkbox";
 import Container from "@cloudscape-design/components/container";
 import ContentLayout from "@cloudscape-design/components/content-layout";
+import DatePicker from "@cloudscape-design/components/date-picker";
 import Form from "@cloudscape-design/components/form";
 import FormField from "@cloudscape-design/components/form-field";
 import Header from "@cloudscape-design/components/header";
 import Input from "@cloudscape-design/components/input";
 import SpaceBetween from "@cloudscape-design/components/space-between";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+
 import { createMusicAction, updateMusicAction } from "@/app/musics/actions";
 import DashboardLayout from "@/components/dashboard-layout";
+import MusicBreadcrumbs from "@/components/music-breadcrumbs";
 import type {
 	CreateMusicInput,
 	MusicWithSheets,
@@ -77,8 +81,7 @@ export default function MusicForm({
 	const [errors, setErrors] = useState<Record<string, string>>({});
 	const [submitError, setSubmitError] = useState<string>();
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const [isSaved, setIsSaved] = useState(false);
-	const [savedMusicId, setSavedMusicId] = useState<string>();
+	const router = useRouter();
 
 	const isEdit = Boolean(data);
 	const updateValue = (
@@ -118,7 +121,6 @@ export default function MusicForm({
 	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		setSubmitError(undefined);
-		setIsSaved(false);
 		if (Object.keys(validate()).length > 0) return;
 		setIsSubmitting(true);
 		try {
@@ -131,26 +133,27 @@ export default function MusicForm({
 				registrationDate: `${values.registrationDate}T00:00:00.000Z`,
 				isTest: values.isTest,
 			};
-			const result = data
-				? await updateMusicAction(data.music.id, {
-						...fields,
-						sheets: difficulties.map(({ key }) => ({
-							id: values.sheets[key].id as string,
-							difficulty: key,
-							level: Number(values.sheets[key].level),
-							notesDesigner: values.sheets[key].notesDesigner.trim(),
-						})),
-					} satisfies UpdateMusicInput)
-				: await createMusicAction({
-						...fields,
-						sheets: difficulties.map(({ key }) => ({
-							difficulty: key,
-							level: Number(values.sheets[key].level),
-							notesDesigner: values.sheets[key].notesDesigner.trim(),
-						})),
-					} satisfies CreateMusicInput);
-			setSavedMusicId(result.music.id);
-			setIsSaved(true);
+			if (data) {
+				await updateMusicAction(data.music.id, {
+					...fields,
+					sheets: difficulties.map(({ key }) => ({
+						id: values.sheets[key].id as string,
+						difficulty: key,
+						level: Number(values.sheets[key].level),
+						notesDesigner: values.sheets[key].notesDesigner.trim(),
+					})),
+				} satisfies UpdateMusicInput);
+			} else {
+				await createMusicAction({
+					...fields,
+					sheets: difficulties.map(({ key }) => ({
+						difficulty: key,
+						level: Number(values.sheets[key].level),
+						notesDesigner: values.sheets[key].notesDesigner.trim(),
+					})),
+				} satisfies CreateMusicInput);
+			}
+			router.push("/musics");
 		} catch (error) {
 			setSubmitError(
 				error instanceof Error ? error.message : "保存に失敗しました。",
@@ -162,7 +165,15 @@ export default function MusicForm({
 
 	return (
 		<DashboardLayout activeHref="/musics">
-			<ContentLayout header={<Header variant="h1">{title}</Header>}>
+			<ContentLayout
+				breadcrumbs={
+					<MusicBreadcrumbs
+						current={title}
+						currentHref={data ? `/musics/${data.music.id}/edit` : "/musics/new"}
+					/>
+				}
+				header={<Header variant="h1">{title}</Header>}
+			>
 				<form onSubmit={handleSubmit}>
 					<Form
 						actions={
@@ -184,16 +195,6 @@ export default function MusicForm({
 							{submitError ? (
 								<Alert type="error" header="保存できませんでした">
 									{submitError}
-								</Alert>
-							) : null}
-							{isSaved && savedMusicId ? (
-								<Alert
-									type="success"
-									action={
-										<Button href={`/musics/${savedMusicId}`}>詳細を表示</Button>
-									}
-								>
-									保存しました。
 								</Alert>
 							) : null}
 							<Container header={<Header variant="h2">楽曲情報</Header>}>
@@ -237,14 +238,11 @@ export default function MusicForm({
 											}
 										/>
 									</FormField>
-									<FormField
-										label="登録日"
-										description="運用上の楽曲登録日"
-										errorText={errors.registrationDate}
-									>
-										<Input
+									<FormField label="登録日" errorText={errors.registrationDate}>
+										<DatePicker
+											format="iso"
+											inputFormat="iso"
 											value={values.registrationDate}
-											placeholder="YYYY-MM-DD"
 											onChange={({ detail }) =>
 												updateValue("registrationDate", detail.value)
 											}

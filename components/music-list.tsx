@@ -8,6 +8,7 @@ import SpaceBetween from "@cloudscape-design/components/space-between";
 import dynamic from "next/dynamic";
 
 import DashboardLayout from "@/components/dashboard-layout";
+import MusicBreadcrumbs from "@/components/music-breadcrumbs";
 import type { MusicListResponse } from "@/lib/api";
 
 const MusicTable = dynamic(() => import("@/components/music-table"), {
@@ -31,6 +32,9 @@ export default function MusicList({
 	return (
 		<DashboardLayout activeHref="/musics">
 			<ContentLayout
+				breadcrumbs={
+					<MusicBreadcrumbs current="楽曲管理" currentHref="/musics" />
+				}
 				header={
 					<Header
 						variant="h1"

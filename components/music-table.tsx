@@ -23,7 +23,6 @@ export default function MusicTable({ data }: { data: MusicListResponse }) {
 					cell: (item) => item.music.artist,
 				},
 				{ header: "BPM", cell: (item) => item.music.bpm },
-				{ header: "譜面", cell: (item) => item.sheets.length },
 				{
 					header: "登録日時",
 					cell: (item) =>
