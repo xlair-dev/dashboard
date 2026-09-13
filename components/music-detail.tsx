@@ -7,6 +7,7 @@ import CopyToClipboard from "@cloudscape-design/components/copy-to-clipboard";
 import Header from "@cloudscape-design/components/header";
 import SpaceBetween from "@cloudscape-design/components/space-between";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import type { ReactNode } from "react";
 
 import DashboardLayout from "@/components/dashboard-layout";
@@ -66,7 +67,19 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 							<DetailItem label="アーティスト" value={music.artist} />
 							<DetailItem label="BPM" value={String(music.bpm)} />
 							<DetailItem label="ジャンル" value={music.genre} />
-							<DetailItem label="ジャケット" value={music.jacket} />
+							<DetailItem
+								label="ジャケット"
+								value={
+									<Image
+										src={music.jacket}
+										alt={`${music.title} のジャケット`}
+										width={192}
+										height={192}
+										className="size-48 object-cover"
+										unoptimized
+									/>
+								}
+							/>
 							<DetailItem
 								label="登録日時"
 								value={new Date(music.registrationDate).toLocaleDateString(

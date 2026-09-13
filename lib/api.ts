@@ -62,6 +62,11 @@ export type UpdateMusicInput = MusicFields & {
 	}>;
 };
 
+type JacketUploadResponse = {
+	uploadUrl: string;
+	jacketUrl: string;
+};
+
 async function getAccessToken(returnTo: string) {
 	const audience = process.env.AUTH0_AUDIENCE ?? "https://api.xlair.dev";
 	try {
@@ -163,4 +168,36 @@ export function updateMusic(musicId: string, input: UpdateMusicInput) {
 		input,
 		`/musics/${musicId}/edit`,
 	);
+}
+
+export async function uploadJacket(musicId: string | undefined, file: File) {
+	const accessToken = await getAccessToken(
+		musicId ? `/musics/${musicId}/edit` : "/musics/new",
+	);
+	const response = await fetch(
+		`${process.env.API_BASE_URL}/admin/jackets/upload-url`,
+		{
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${accessToken.token}`,
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				...(musicId ? { musicId } : {}),
+				contentType: file.type,
+			}),
+			cache: "no-store",
+		},
+	);
+	if (!response.ok)
+		throw new Error(`Failed to create jacket upload URL: ${response.status}`);
+	const upload = (await response.json()) as JacketUploadResponse;
+	const uploadResponse = await fetch(upload.uploadUrl, {
+		method: "PUT",
+		headers: { "Content-Type": file.type },
+		body: await file.arrayBuffer(),
+	});
+	if (!uploadResponse.ok)
+		throw new Error(`Failed to upload jacket: ${uploadResponse.status}`);
+	return upload.jacketUrl;
 }
