@@ -8,36 +8,34 @@ import type { MusicListResponse } from "@/lib/api";
 
 export default function MusicTable({ data }: { data: MusicListResponse }) {
 	return (
-		<div>
-			<Header counter={`(${data.items.length})`}>楽曲一覧</Header>
-			<Table
-				className="px-4 sm:px-6"
-				columnDefinitions={[
-					{
-						header: "タイトル",
-						cell: (item) => (
-							<Link href={`/musics/${encodeURIComponent(item.music.id)}`}>
-								{item.music.title}
-							</Link>
-						),
-					},
-					{
-						header: "アーティスト",
-						cell: (item) => item.music.artist,
-					},
-					{
-						header: "BPM",
-						cell: (item) => item.music.bpm,
-					},
-					{
-						header: "登録日時",
-						cell: (item) =>
-							new Date(item.music.registrationDate).toLocaleDateString("ja-JP"),
-					},
-				]}
-				items={data.items}
-				empty={<span>楽曲がありません。</span>}
-			/>
-		</div>
+		<Table
+			variant="container"
+			header={<Header counter={`(${data.items.length})`}>楽曲一覧</Header>}
+			columnDefinitions={[
+				{
+					header: "タイトル",
+					cell: (item) => (
+						<Link href={`/musics/${encodeURIComponent(item.music.id)}`}>
+							{item.music.title}
+						</Link>
+					),
+				},
+				{
+					header: "アーティスト",
+					cell: (item) => item.music.artist,
+				},
+				{
+					header: "BPM",
+					cell: (item) => item.music.bpm,
+				},
+				{
+					header: "登録日時",
+					cell: (item) =>
+						new Date(item.music.registrationDate).toLocaleDateString("ja-JP"),
+				},
+			]}
+			items={data.items}
+			empty={<span>楽曲がありません。</span>}
+		/>
 	);
 }
