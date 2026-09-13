@@ -115,7 +115,8 @@ async function writeMusic(
 ): Promise<MusicWithSheets> {
 	const accessToken = await getAccessToken(returnTo);
 	const formData = new FormData();
-	formData.append("request", JSON.stringify(body));
+	const { jacket: _jacketUrl, ...metadata } = body;
+	formData.append("metadata", JSON.stringify(metadata));
 	if (jacket) formData.append("jacket", jacket);
 	const response = await fetch(`${process.env.API_BASE_URL}${path}`, {
 		method: "POST",
