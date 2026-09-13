@@ -14,6 +14,7 @@ export default function MusicSheetsTable({
 }) {
 	return (
 		<Table
+			className="px-4 sm:px-6"
 			columnDefinitions={[
 				{ header: "難易度", cell: (item) => item.difficultyLabel },
 				{ header: "レベル", cell: (item) => item.level },
