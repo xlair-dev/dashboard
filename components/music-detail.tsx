@@ -65,14 +65,12 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 							/>
 						</dl>
 					</Container>
-					<Container header={<Header variant="h2">譜面</Header>}>
-						<MusicSheetsTable
-							sheets={data.sheets.map((sheet) => ({
-								...sheet,
-								difficultyLabel: difficultyLabels[sheet.difficulty],
-							}))}
-						/>
-					</Container>
+					<MusicSheetsTable
+						sheets={data.sheets.map((sheet) => ({
+							...sheet,
+							difficultyLabel: difficultyLabels[sheet.difficulty],
+						}))}
+					/>
 				</SpaceBetween>
 			</ContentLayout>
 		</DashboardLayout>
