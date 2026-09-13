@@ -97,8 +97,6 @@ export default function MusicForm({
 		if (!values.title.trim()) nextErrors.title = "タイトルを入力してください。";
 		if (!values.artist.trim())
 			nextErrors.artist = "アーティストを入力してください。";
-		if (!values.jacket.trim() && jacketFile.length === 0)
-			nextErrors.jacket = "ジャケットを入力してください。";
 		if (!values.registrationDate)
 			nextErrors.registrationDate = "登録日を入力してください。";
 		else if (!/^\d{4}-\d{2}-\d{2}$/.test(values.registrationDate))
