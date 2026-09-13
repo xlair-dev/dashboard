@@ -152,6 +152,21 @@ async function uploadJacket(
 	return response.json() as Promise<MusicWithSheets>;
 }
 
+export async function deleteJacket(musicId: string): Promise<MusicWithSheets> {
+	const accessToken = await getAccessToken(`/musics/${musicId}/edit`);
+	const response = await fetch(
+		`${process.env.API_BASE_URL}/admin/musics/${encodeURIComponent(musicId)}/jacket`,
+		{
+			method: "DELETE",
+			headers: { Authorization: `Bearer ${accessToken.token}` },
+			cache: "no-store",
+		},
+	);
+	if (!response.ok)
+		throw new Error(`Failed to delete jacket: ${response.status}`);
+	return response.json() as Promise<MusicWithSheets>;
+}
+
 export function createMusic(input: CreateMusicInput, jacket?: File) {
 	return writeMusic("/admin/musics", input, jacket, "/musics/new");
 }

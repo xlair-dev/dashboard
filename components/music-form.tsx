@@ -16,7 +16,11 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { createMusicAction, updateMusicAction } from "@/app/musics/actions";
+import {
+	createMusicAction,
+	deleteJacketAction,
+	updateMusicAction,
+} from "@/app/musics/actions";
 import DashboardLayout from "@/components/dashboard-layout";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
 import type {
@@ -83,6 +87,7 @@ export default function MusicForm({
 	const [errors, setErrors] = useState<Record<string, string>>({});
 	const [submitError, setSubmitError] = useState<string>();
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [isDeletingJacket, setIsDeletingJacket] = useState(false);
 	const [jacketFile, setJacketFile] = useState<File[]>([]);
 	const router = useRouter();
 
@@ -170,6 +175,25 @@ export default function MusicForm({
 		}
 	}
 
+	async function handleDeleteJacket() {
+		if (!data) return;
+		setSubmitError(undefined);
+		setIsDeletingJacket(true);
+		try {
+			await deleteJacketAction(data.music.id);
+			setValues((current) => ({ ...current, jacket: "" }));
+			setJacketFile([]);
+		} catch (error) {
+			setSubmitError(
+				error instanceof Error
+					? error.message
+					: "ジャケットを削除できませんでした。",
+			);
+		} finally {
+			setIsDeletingJacket(false);
+		}
+	}
+
 	return (
 		<DashboardLayout activeHref="/musics">
 			<ContentLayout
@@ -251,14 +275,25 @@ export default function MusicForm({
 												}}
 											/>
 											{values.jacket ? (
-												<Image
-													src={values.jacket}
-													alt="ジャケットプレビュー"
-													width={128}
-													height={128}
-													className="size-32 object-cover"
-													unoptimized
-												/>
+												<SpaceBetween size="s">
+													<Image
+														src={values.jacket}
+														alt="ジャケットプレビュー"
+														width={128}
+														height={128}
+														className="size-32 object-cover"
+														unoptimized
+													/>
+													{data ? (
+														<Button
+															loading={isDeletingJacket}
+															disabled={isSubmitting || isDeletingJacket}
+															onClick={handleDeleteJacket}
+														>
+															ジャケットを削除
+														</Button>
+													) : null}
+												</SpaceBetween>
 											) : null}
 										</SpaceBetween>
 									</FormField>
