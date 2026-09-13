@@ -76,6 +76,7 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 											alt={`${music.title} のジャケット`}
 											width={192}
 											height={192}
+											loading="eager"
 											className="size-48 object-cover"
 											unoptimized
 										/>
