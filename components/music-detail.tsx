@@ -50,7 +50,6 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 				<SpaceBetween size="l">
 					<Container header={<Header variant="h2">楽曲情報</Header>}>
 						<dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-							<DetailItem label="タイトル" value={music.title} />
 							<DetailItem
 								label="ID"
 								value={
@@ -63,6 +62,7 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 									/>
 								}
 							/>
+							<DetailItem label="タイトル" value={music.title} />
 							<DetailItem label="アーティスト" value={music.artist} />
 							<DetailItem label="BPM" value={String(music.bpm)} />
 							<DetailItem label="ジャンル" value={music.genre} />
