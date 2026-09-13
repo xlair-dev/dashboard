@@ -32,9 +32,7 @@ export default function MusicList({
 	return (
 		<DashboardLayout activeHref="/musics">
 			<ContentLayout
-				breadcrumbs={
-					<MusicBreadcrumbs current="楽曲管理" currentHref="/musics" />
-				}
+				breadcrumbs={<MusicBreadcrumbs />}
 				header={
 					<Header
 						variant="h1"
