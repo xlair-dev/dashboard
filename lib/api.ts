@@ -135,14 +135,15 @@ async function uploadJacket(
 	returnTo: string,
 ): Promise<MusicWithSheets> {
 	const accessToken = await getAccessToken(returnTo);
-	const formData = new FormData();
-	formData.append("jacket", jacket);
 	const response = await fetch(
 		`${process.env.API_BASE_URL}/admin/musics/${encodeURIComponent(musicId)}/jacket`,
 		{
 			method: "POST",
-			headers: { Authorization: `Bearer ${accessToken.token}` },
-			body: formData,
+			headers: {
+				Authorization: `Bearer ${accessToken.token}`,
+				"Content-Type": jacket.type,
+			},
+			body: jacket,
 			cache: "no-store",
 		},
 	);
