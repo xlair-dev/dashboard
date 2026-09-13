@@ -281,6 +281,7 @@ export default function MusicForm({
 														alt="ジャケットプレビュー"
 														width={128}
 														height={128}
+														loading="eager"
 														className="size-32 object-cover"
 														unoptimized
 													/>
