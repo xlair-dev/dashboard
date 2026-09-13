@@ -14,6 +14,7 @@ export default function MusicSheetsTable({
 }) {
 	return (
 		<Table
+			className="px-4 sm:px-6"
 			variant="container"
 			header={<Header counter={`(${sheets.length})`}>譜面一覧</Header>}
 			columnDefinitions={[
