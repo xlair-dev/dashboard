@@ -35,18 +35,10 @@ export type MusicListResponse = {
 	nextCursor: string | null;
 };
 
-export async function fetchMusics(
-	searchParams: { cursor?: string; limit?: number } = {},
-): Promise<MusicListResponse> {
+async function getAccessToken(returnTo: string) {
 	const audience = process.env.AUTH0_AUDIENCE ?? "https://api.xlair.dev";
-	const params = new URLSearchParams();
-	if (searchParams.cursor) params.set("cursor", searchParams.cursor);
-	if (searchParams.limit) params.set("limit", String(searchParams.limit));
-	const returnTo = `/musics${params.size ? `?${params.toString()}` : ""}`;
-
-	let accessToken: Awaited<ReturnType<typeof auth0.getAccessToken>>;
 	try {
-		accessToken = await auth0.getAccessToken({ audience });
+		return await auth0.getAccessToken({ audience });
 	} catch (error) {
 		if (
 			error instanceof AccessTokenError &&
@@ -64,6 +56,16 @@ export async function fetchMusics(
 		}
 		throw error;
 	}
+}
+
+export async function fetchMusics(
+	searchParams: { cursor?: string; limit?: number } = {},
+): Promise<MusicListResponse> {
+	const params = new URLSearchParams();
+	if (searchParams.cursor) params.set("cursor", searchParams.cursor);
+	if (searchParams.limit) params.set("limit", String(searchParams.limit));
+	const returnTo = `/musics${params.size ? `?${params.toString()}` : ""}`;
+	const accessToken = await getAccessToken(returnTo);
 
 	const response = await fetch(
 		`${process.env.API_BASE_URL}/admin/musics?${params.toString()}`,
@@ -78,4 +80,21 @@ export async function fetchMusics(
 	}
 
 	return response.json() as Promise<MusicListResponse>;
+}
+
+export async function fetchMusic(musicId: string): Promise<MusicWithSheets> {
+	const accessToken = await getAccessToken(`/musics/${musicId}`);
+	const response = await fetch(
+		`${process.env.API_BASE_URL}/admin/musics/${encodeURIComponent(musicId)}`,
+		{
+			headers: { Authorization: `Bearer ${accessToken.token}` },
+			cache: "no-store",
+		},
+	);
+
+	if (!response.ok) {
+		throw new Error(`Failed to fetch music: ${response.status}`);
+	}
+
+	return response.json() as Promise<MusicWithSheets>;
 }
