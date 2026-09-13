@@ -29,7 +29,7 @@ import type {
 	UpdateMusicInput,
 } from "@/lib/api";
 
-type Difficulty = "easy" | "normal" | "hard";
+type Difficulty = "basic" | "advanced" | "master";
 type SheetDraft = { id?: string; level: string; notesDesigner: string };
 type FormValues = {
 	title: string;
@@ -42,9 +42,9 @@ type FormValues = {
 };
 
 const difficulties: Array<{ key: Difficulty; label: string }> = [
-	{ key: "easy", label: "Easy" },
-	{ key: "normal", label: "Normal" },
-	{ key: "hard", label: "Hard" },
+	{ key: "basic", label: "Basic" },
+	{ key: "advanced", label: "Advanced" },
+	{ key: "master", label: "Master" },
 ];
 
 function isPositiveSingleDecimal(value: string) {

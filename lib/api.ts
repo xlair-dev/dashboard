@@ -9,7 +9,7 @@ import { auth0 } from "@/lib/auth0";
 export type Sheet = {
 	id: string;
 	musicId: string;
-	difficulty: "easy" | "normal" | "hard";
+	difficulty: "basic" | "advanced" | "master";
 	level: number;
 	notesDesigner: string;
 };
