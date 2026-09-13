@@ -6,12 +6,20 @@ import {
 	type MusicWithSheets,
 	type UpdateMusicInput,
 	updateMusic,
+	uploadJacket,
 } from "@/lib/api";
 
 export async function createMusicAction(
 	input: CreateMusicInput,
 ): Promise<MusicWithSheets> {
 	return createMusic(input);
+}
+
+export async function uploadJacketAction(
+	musicId: string | undefined,
+	file: File,
+) {
+	return uploadJacket(musicId, file);
 }
 
 export async function updateMusicAction(

@@ -4,6 +4,7 @@ import CopyToClipboard from "@cloudscape-design/components/copy-to-clipboard";
 import Header from "@cloudscape-design/components/header";
 import Link from "@cloudscape-design/components/link";
 import Table from "@cloudscape-design/components/table";
+import Image from "next/image";
 
 import type { MusicListResponse } from "@/lib/api";
 
@@ -14,6 +15,19 @@ export default function MusicTable({ data }: { data: MusicListResponse }) {
 			variant="container"
 			header={<Header counter={`(${data.items.length})`}>楽曲一覧</Header>}
 			columnDefinitions={[
+				{
+					header: "ジャケット",
+					cell: (item) => (
+						<Image
+							src={item.music.jacket}
+							alt={`${item.music.title} のジャケット`}
+							width={48}
+							height={48}
+							className="size-12 object-cover"
+							unoptimized
+						/>
+					),
+				},
 				{
 					header: "タイトル",
 					cell: (item) => (
