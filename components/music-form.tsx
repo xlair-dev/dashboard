@@ -6,15 +6,21 @@ import Checkbox from "@cloudscape-design/components/checkbox";
 import Container from "@cloudscape-design/components/container";
 import ContentLayout from "@cloudscape-design/components/content-layout";
 import DatePicker from "@cloudscape-design/components/date-picker";
+import FileUpload from "@cloudscape-design/components/file-upload";
 import Form from "@cloudscape-design/components/form";
 import FormField from "@cloudscape-design/components/form-field";
 import Header from "@cloudscape-design/components/header";
 import Input from "@cloudscape-design/components/input";
 import SpaceBetween from "@cloudscape-design/components/space-between";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { createMusicAction, updateMusicAction } from "@/app/musics/actions";
+import {
+	createMusicAction,
+	deleteJacketAction,
+	updateMusicAction,
+} from "@/app/musics/actions";
 import DashboardLayout from "@/components/dashboard-layout";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
 import type {
@@ -81,6 +87,8 @@ export default function MusicForm({
 	const [errors, setErrors] = useState<Record<string, string>>({});
 	const [submitError, setSubmitError] = useState<string>();
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [isDeletingJacket, setIsDeletingJacket] = useState(false);
+	const [jacketFile, setJacketFile] = useState<File[]>([]);
 	const router = useRouter();
 
 	const isEdit = Boolean(data);
@@ -94,8 +102,6 @@ export default function MusicForm({
 		if (!values.title.trim()) nextErrors.title = "タイトルを入力してください。";
 		if (!values.artist.trim())
 			nextErrors.artist = "アーティストを入力してください。";
-		if (!values.jacket.trim())
-			nextErrors.jacket = "ジャケットを入力してください。";
 		if (!values.registrationDate)
 			nextErrors.registrationDate = "登録日を入力してください。";
 		else if (!/^\d{4}-\d{2}-\d{2}$/.test(values.registrationDate))
@@ -129,29 +135,35 @@ export default function MusicForm({
 				artist: values.artist.trim(),
 				bpm: Number(values.bpm),
 				genre: "ORIGINAL" as const,
-				jacket: values.jacket.trim(),
 				registrationDate: `${values.registrationDate}T00:00:00.000Z`,
 				isTest: values.isTest,
 			};
 			if (data) {
-				await updateMusicAction(data.music.id, {
-					...fields,
-					sheets: difficulties.map(({ key }) => ({
-						id: values.sheets[key].id as string,
-						difficulty: key,
-						level: Number(values.sheets[key].level),
-						notesDesigner: values.sheets[key].notesDesigner.trim(),
-					})),
-				} satisfies UpdateMusicInput);
+				await updateMusicAction(
+					data.music.id,
+					{
+						...fields,
+						sheets: difficulties.map(({ key }) => ({
+							id: values.sheets[key].id as string,
+							difficulty: key,
+							level: Number(values.sheets[key].level),
+							notesDesigner: values.sheets[key].notesDesigner.trim(),
+						})),
+					} satisfies UpdateMusicInput,
+					jacketFile[0],
+				);
 			} else {
-				await createMusicAction({
-					...fields,
-					sheets: difficulties.map(({ key }) => ({
-						difficulty: key,
-						level: Number(values.sheets[key].level),
-						notesDesigner: values.sheets[key].notesDesigner.trim(),
-					})),
-				} satisfies CreateMusicInput);
+				await createMusicAction(
+					{
+						...fields,
+						sheets: difficulties.map(({ key }) => ({
+							difficulty: key,
+							level: Number(values.sheets[key].level),
+							notesDesigner: values.sheets[key].notesDesigner.trim(),
+						})),
+					} satisfies CreateMusicInput,
+					jacketFile[0],
+				);
 			}
 			router.push(data ? `/musics/${data.music.id}` : "/musics");
 		} catch (error) {
@@ -160,6 +172,25 @@ export default function MusicForm({
 			);
 		} finally {
 			setIsSubmitting(false);
+		}
+	}
+
+	async function handleDeleteJacket() {
+		if (!data) return;
+		setSubmitError(undefined);
+		setIsDeletingJacket(true);
+		try {
+			await deleteJacketAction(data.music.id);
+			setValues((current) => ({ ...current, jacket: "" }));
+			setJacketFile([]);
+		} catch (error) {
+			setSubmitError(
+				error instanceof Error
+					? error.message
+					: "ジャケットを削除できませんでした。",
+			);
+		} finally {
+			setIsDeletingJacket(false);
 		}
 	}
 
@@ -231,12 +262,40 @@ export default function MusicForm({
 										<Input value="ORIGINAL" disabled />
 									</FormField>
 									<FormField label="ジャケット" errorText={errors.jacket}>
-										<Input
-											value={values.jacket}
-											onChange={({ detail }) =>
-												updateValue("jacket", detail.value)
-											}
-										/>
+										<SpaceBetween size="s">
+											<FileUpload
+												accept="image/jpeg,image/png,image/webp"
+												showFileThumbnail
+												value={jacketFile}
+												onChange={({ detail }) => setJacketFile(detail.value)}
+												i18nStrings={{
+													uploadButtonText: () => "画像を選択",
+													dropzoneText: () => "画像をここにドロップ",
+													removeFileAriaLabel: () => "画像を削除",
+												}}
+											/>
+											{values.jacket ? (
+												<SpaceBetween size="s">
+													<Image
+														src={values.jacket}
+														alt="ジャケットプレビュー"
+														width={128}
+														height={128}
+														className="size-32 object-cover"
+														unoptimized
+													/>
+													{data ? (
+														<Button
+															loading={isDeletingJacket}
+															disabled={isSubmitting || isDeletingJacket}
+															onClick={handleDeleteJacket}
+														>
+															ジャケットを削除
+														</Button>
+													) : null}
+												</SpaceBetween>
+											) : null}
+										</SpaceBetween>
 									</FormField>
 									<FormField label="登録日" errorText={errors.registrationDate}>
 										<DatePicker
