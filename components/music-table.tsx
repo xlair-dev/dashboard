@@ -9,7 +9,6 @@ import type { MusicListResponse } from "@/lib/api";
 export default function MusicTable({ data }: { data: MusicListResponse }) {
 	return (
 		<Table
-			className="px-4 sm:px-6"
 			columnDefinitions={[
 				{
 					header: "タイトル",
@@ -27,7 +26,7 @@ export default function MusicTable({ data }: { data: MusicListResponse }) {
 				{
 					header: "登録日時",
 					cell: (item) =>
-						new Date(item.music.registrationDate).toLocaleString("ja-JP"),
+						new Date(item.music.registrationDate).toLocaleDateString("ja-JP"),
 				},
 			]}
 			items={data.items}

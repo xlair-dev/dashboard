@@ -55,7 +55,9 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 							<DetailItem label="ジャケット" value={music.jacket} />
 							<DetailItem
 								label="登録日時"
-								value={new Date(music.registrationDate).toISOString()}
+								value={new Date(music.registrationDate).toLocaleDateString(
+									"ja-JP",
+								)}
 							/>
 							<DetailItem
 								label="テスト楽曲"
