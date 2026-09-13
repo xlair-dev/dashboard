@@ -9,6 +9,9 @@ import type { MusicListResponse } from "@/lib/api";
 export default function MusicTable({ data }: { data: MusicListResponse }) {
 	return (
 		<Table
+			className="px-4 sm:px-6"
+			variant="container"
+			header={<Header counter={`(${data.items.length})`}>楽曲一覧</Header>}
 			columnDefinitions={[
 				{
 					header: "タイトル",
@@ -22,16 +25,17 @@ export default function MusicTable({ data }: { data: MusicListResponse }) {
 					header: "アーティスト",
 					cell: (item) => item.music.artist,
 				},
-				{ header: "BPM", cell: (item) => item.music.bpm },
-				{ header: "譜面", cell: (item) => item.sheets.length },
+				{
+					header: "BPM",
+					cell: (item) => item.music.bpm,
+				},
 				{
 					header: "登録日時",
 					cell: (item) =>
-						new Date(item.music.registrationDate).toLocaleString("ja-JP"),
+						new Date(item.music.registrationDate).toLocaleDateString("ja-JP"),
 				},
 			]}
 			items={data.items}
-			header={<Header counter={`(${data.items.length})`}>楽曲一覧</Header>}
 			empty={<span>楽曲がありません。</span>}
 		/>
 	);
