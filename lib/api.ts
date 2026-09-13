@@ -63,8 +63,15 @@ export type UpdateMusicInput = MusicFields & {
 };
 
 type JacketUploadResponse = {
+	uploadId: string;
 	uploadUrl: string;
 	jacketUrl: string;
+};
+
+export type UploadedJacket = {
+	uploadId: string;
+	jacketUrl: string;
+	contentType: string;
 };
 
 async function getAccessToken(returnTo: string) {
@@ -170,7 +177,18 @@ export function updateMusic(musicId: string, input: UpdateMusicInput) {
 	);
 }
 
-export async function uploadJacket(musicId: string | undefined, file: File) {
+export async function uploadJacket(
+	musicId: string | undefined,
+	file: File,
+): Promise<UploadedJacket> {
+	if (
+		!(["image/jpeg", "image/png", "image/webp"] as string[]).includes(file.type)
+	)
+		throw new Error(
+			"ジャケット画像は JPEG、PNG、WebP のいずれかを選択してください。",
+		);
+	if (file.size > 5 * 1024 * 1024)
+		throw new Error("ジャケット画像は 5 MiB 以下にしてください。");
 	const accessToken = await getAccessToken(
 		musicId ? `/musics/${musicId}/edit` : "/musics/new",
 	);
@@ -192,12 +210,60 @@ export async function uploadJacket(musicId: string | undefined, file: File) {
 	if (!response.ok)
 		throw new Error(`Failed to create jacket upload URL: ${response.status}`);
 	const upload = (await response.json()) as JacketUploadResponse;
-	const uploadResponse = await fetch(upload.uploadUrl, {
-		method: "PUT",
-		headers: { "Content-Type": file.type },
-		body: await file.arrayBuffer(),
-	});
-	if (!uploadResponse.ok)
-		throw new Error(`Failed to upload jacket: ${uploadResponse.status}`);
-	return upload.jacketUrl;
+	const uploaded: UploadedJacket = {
+		uploadId: upload.uploadId,
+		jacketUrl: upload.jacketUrl,
+		contentType: file.type,
+	};
+	try {
+		const uploadResponse = await fetch(upload.uploadUrl, {
+			method: "PUT",
+			headers: { "Content-Type": file.type },
+			body: await file.arrayBuffer(),
+		});
+		if (!uploadResponse.ok)
+			throw new Error(`Failed to upload jacket: ${uploadResponse.status}`);
+		const finalizeResponse = await fetch(
+			`${process.env.API_BASE_URL}/admin/jackets/${encodeURIComponent(upload.uploadId)}/finalize`,
+			{
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${accessToken.token}`,
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ contentType: file.type }),
+				cache: "no-store",
+			},
+		);
+		if (!finalizeResponse.ok)
+			throw new Error(
+				`Failed to finalize jacket upload: ${finalizeResponse.status}`,
+			);
+		return uploaded;
+	} catch (error) {
+		try {
+			await deleteJacket(uploaded);
+		} catch {
+			// Cleanup is best effort after an upload failure.
+		}
+		throw error;
+	}
+}
+
+export async function deleteJacket(upload: UploadedJacket) {
+	const accessToken = await getAccessToken("/musics");
+	const response = await fetch(
+		`${process.env.API_BASE_URL}/admin/jackets/${encodeURIComponent(upload.uploadId)}`,
+		{
+			method: "DELETE",
+			headers: {
+				Authorization: `Bearer ${accessToken.token}`,
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ contentType: upload.contentType }),
+			cache: "no-store",
+		},
+	);
+	if (!response.ok)
+		throw new Error(`Failed to delete jacket upload: ${response.status}`);
 }

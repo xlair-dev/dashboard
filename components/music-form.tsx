@@ -18,6 +18,7 @@ import { useState } from "react";
 
 import {
 	createMusicAction,
+	deleteJacketAction,
 	updateMusicAction,
 	uploadJacketAction,
 } from "@/app/musics/actions";
@@ -130,10 +131,18 @@ export default function MusicForm({
 		setSubmitError(undefined);
 		if (Object.keys(validate()).length > 0) return;
 		setIsSubmitting(true);
+		let uploadedJacket:
+			| Awaited<ReturnType<typeof uploadJacketAction>>
+			| undefined;
 		try {
-			const jacket = jacketFile[0]
-				? await uploadJacketAction(data?.music.id, jacketFile[0])
-				: values.jacket.trim();
+			let jacket = values.jacket.trim();
+			if (jacketFile[0]) {
+				uploadedJacket = await uploadJacketAction(
+					data?.music.id,
+					jacketFile[0],
+				);
+				jacket = uploadedJacket.jacketUrl;
+			}
 			const fields = {
 				title: values.title.trim(),
 				artist: values.artist.trim(),
@@ -165,6 +174,13 @@ export default function MusicForm({
 			}
 			router.push(data ? `/musics/${data.music.id}` : "/musics");
 		} catch (error) {
+			if (uploadedJacket) {
+				try {
+					await deleteJacketAction(uploadedJacket);
+				} catch {
+					// Cleanup is best effort after a failed music mutation.
+				}
+			}
 			setSubmitError(
 				error instanceof Error ? error.message : "保存に失敗しました。",
 			);
