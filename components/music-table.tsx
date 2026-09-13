@@ -1,5 +1,6 @@
 "use client";
 
+import CopyToClipboard from "@cloudscape-design/components/copy-to-clipboard";
 import Header from "@cloudscape-design/components/header";
 import Link from "@cloudscape-design/components/link";
 import Table from "@cloudscape-design/components/table";
@@ -33,6 +34,18 @@ export default function MusicTable({ data }: { data: MusicListResponse }) {
 					header: "登録日時",
 					cell: (item) =>
 						new Date(item.music.registrationDate).toLocaleDateString("ja-JP"),
+				},
+				{
+					header: "ID",
+					cell: (item) => (
+						<CopyToClipboard
+							variant="inline"
+							textToCopy={item.music.id}
+							copySuccessText="コピーしました"
+							copyErrorText="コピーに失敗しました"
+							copyButtonAriaLabel="楽曲 ID をコピー"
+						/>
+					),
 				},
 			]}
 			items={data.items}

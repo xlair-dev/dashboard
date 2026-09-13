@@ -3,9 +3,11 @@
 import Button from "@cloudscape-design/components/button";
 import Container from "@cloudscape-design/components/container";
 import ContentLayout from "@cloudscape-design/components/content-layout";
+import CopyToClipboard from "@cloudscape-design/components/copy-to-clipboard";
 import Header from "@cloudscape-design/components/header";
 import SpaceBetween from "@cloudscape-design/components/space-between";
 import dynamic from "next/dynamic";
+import type { ReactNode } from "react";
 
 import DashboardLayout from "@/components/dashboard-layout";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
@@ -48,6 +50,18 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 				<SpaceBetween size="l">
 					<Container header={<Header variant="h2">楽曲情報</Header>}>
 						<dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+							<DetailItem
+								label="ID"
+								value={
+									<CopyToClipboard
+										variant="inline"
+										textToCopy={music.id}
+										copySuccessText="コピーしました"
+										copyErrorText="コピーに失敗しました"
+										copyButtonAriaLabel="楽曲 ID をコピー"
+									/>
+								}
+							/>
 							<DetailItem label="タイトル" value={music.title} />
 							<DetailItem label="アーティスト" value={music.artist} />
 							<DetailItem label="BPM" value={String(music.bpm)} />
@@ -77,7 +91,7 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 	);
 }
 
-function DetailItem({ label, value }: { label: string; value: string }) {
+function DetailItem({ label, value }: { label: string; value: ReactNode }) {
 	return (
 		<div>
 			<dt className="font-semibold">{label}</dt>
