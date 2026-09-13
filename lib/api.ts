@@ -66,12 +66,14 @@ type JacketUploadResponse = {
 	uploadId: string;
 	uploadUrl: string;
 	jacketUrl: string;
+	cleanupToken: string;
 };
 
 export type UploadedJacket = {
 	uploadId: string;
 	jacketUrl: string;
 	contentType: string;
+	cleanupToken: string;
 };
 
 async function getAccessToken(returnTo: string) {
@@ -200,10 +202,7 @@ export async function uploadJacket(
 				Authorization: `Bearer ${accessToken.token}`,
 				"Content-Type": "application/json",
 			},
-			body: JSON.stringify({
-				...(musicId ? { musicId } : {}),
-				contentType: file.type,
-			}),
+			body: JSON.stringify({ contentType: file.type }),
 			cache: "no-store",
 		},
 	);
@@ -214,6 +213,7 @@ export async function uploadJacket(
 		uploadId: upload.uploadId,
 		jacketUrl: upload.jacketUrl,
 		contentType: file.type,
+		cleanupToken: upload.cleanupToken,
 	};
 	try {
 		const uploadResponse = await fetch(upload.uploadUrl, {
@@ -231,7 +231,10 @@ export async function uploadJacket(
 					Authorization: `Bearer ${accessToken.token}`,
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({ contentType: file.type }),
+				body: JSON.stringify({
+					contentType: file.type,
+					cleanupToken: uploaded.cleanupToken,
+				}),
 				cache: "no-store",
 			},
 		);
@@ -260,7 +263,10 @@ export async function deleteJacket(upload: UploadedJacket) {
 				Authorization: `Bearer ${accessToken.token}`,
 				"Content-Type": "application/json",
 			},
-			body: JSON.stringify({ contentType: upload.contentType }),
+			body: JSON.stringify({
+				contentType: upload.contentType,
+				cleanupToken: upload.cleanupToken,
+			}),
 			cache: "no-store",
 		},
 	);
