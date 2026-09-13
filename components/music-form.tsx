@@ -295,8 +295,30 @@ export default function MusicForm({
 											options={genres}
 										/>
 									</FormField>
-									<FormField label="ジャケット" errorText={errors.jacket}>
-										<SpaceBetween size="s">
+									<FormField label="登録日" errorText={errors.registrationDate}>
+										<DatePicker
+											format="iso"
+											inputFormat="iso"
+											value={values.registrationDate}
+											onChange={({ detail }) =>
+												updateValue("registrationDate", detail.value)
+											}
+										/>
+									</FormField>
+									<Checkbox
+										checked={values.isTest}
+										onChange={({ detail }) =>
+											updateValue("isTest", detail.checked)
+										}
+									>
+										テスト楽曲
+									</Checkbox>
+								</SpaceBetween>
+							</Container>
+							<Container header={<Header variant="h2">アセット</Header>}>
+								<FormField label="ジャケット" errorText={errors.jacket}>
+									<SpaceBetween size="s">
+										{!jacketFile.length && !values.jacket ? (
 											<FileUpload
 												accept="image/jpeg,image/png,image/webp"
 												value={jacketFile}
@@ -307,7 +329,28 @@ export default function MusicForm({
 													removeFileAriaLabel: () => "画像を削除",
 												}}
 											/>
-											{previewUrl ? (
+										) : null}
+										{jacketFile[0] ? (
+											<Container>
+												<SpaceBetween
+													direction="horizontal"
+													size="s"
+													alignItems="center"
+												>
+													<span className="break-all">
+														{jacketFile[0].name}
+													</span>
+													<Button
+														variant="icon"
+														iconName="close"
+														ariaLabel="選択した画像を削除"
+														onClick={() => setJacketFile([])}
+													/>
+												</SpaceBetween>
+											</Container>
+										) : null}
+										{previewUrl ? (
+											<Container>
 												<SpaceBetween size="s">
 													<Image
 														src={previewUrl}
@@ -328,28 +371,10 @@ export default function MusicForm({
 														</Button>
 													) : null}
 												</SpaceBetween>
-											) : null}
-										</SpaceBetween>
-									</FormField>
-									<FormField label="登録日" errorText={errors.registrationDate}>
-										<DatePicker
-											format="iso"
-											inputFormat="iso"
-											value={values.registrationDate}
-											onChange={({ detail }) =>
-												updateValue("registrationDate", detail.value)
-											}
-										/>
-									</FormField>
-									<Checkbox
-										checked={values.isTest}
-										onChange={({ detail }) =>
-											updateValue("isTest", detail.checked)
-										}
-									>
-										テスト楽曲
-									</Checkbox>
-								</SpaceBetween>
+											</Container>
+										) : null}
+									</SpaceBetween>
+								</FormField>
 							</Container>
 							<Container header={<Header variant="h2">譜面</Header>}>
 								<SpaceBetween size="l">
