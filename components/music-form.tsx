@@ -16,12 +16,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import {
-	createMusicAction,
-	deleteJacketAction,
-	updateMusicAction,
-	uploadJacketAction,
-} from "@/app/musics/actions";
+import { createMusicAction, updateMusicAction } from "@/app/musics/actions";
 import DashboardLayout from "@/components/dashboard-layout";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
 import type {
@@ -131,53 +126,45 @@ export default function MusicForm({
 		setSubmitError(undefined);
 		if (Object.keys(validate()).length > 0) return;
 		setIsSubmitting(true);
-		let uploadedJacket:
-			| Awaited<ReturnType<typeof uploadJacketAction>>
-			| undefined;
 		try {
-			let jacket = values.jacket.trim();
-			if (jacketFile[0]) {
-				uploadedJacket = await uploadJacketAction(jacketFile[0]);
-				jacket = uploadedJacket.jacketUrl;
-			}
 			const fields = {
 				title: values.title.trim(),
 				artist: values.artist.trim(),
 				bpm: Number(values.bpm),
 				genre: "ORIGINAL" as const,
-				jacket,
+				jacket: values.jacket.trim(),
 				registrationDate: `${values.registrationDate}T00:00:00.000Z`,
 				isTest: values.isTest,
 			};
 			if (data) {
-				await updateMusicAction(data.music.id, {
-					...fields,
-					sheets: difficulties.map(({ key }) => ({
-						id: values.sheets[key].id as string,
-						difficulty: key,
-						level: Number(values.sheets[key].level),
-						notesDesigner: values.sheets[key].notesDesigner.trim(),
-					})),
-				} satisfies UpdateMusicInput);
+				await updateMusicAction(
+					data.music.id,
+					{
+						...fields,
+						sheets: difficulties.map(({ key }) => ({
+							id: values.sheets[key].id as string,
+							difficulty: key,
+							level: Number(values.sheets[key].level),
+							notesDesigner: values.sheets[key].notesDesigner.trim(),
+						})),
+					} satisfies UpdateMusicInput,
+					jacketFile[0],
+				);
 			} else {
-				await createMusicAction({
-					...fields,
-					sheets: difficulties.map(({ key }) => ({
-						difficulty: key,
-						level: Number(values.sheets[key].level),
-						notesDesigner: values.sheets[key].notesDesigner.trim(),
-					})),
-				} satisfies CreateMusicInput);
+				await createMusicAction(
+					{
+						...fields,
+						sheets: difficulties.map(({ key }) => ({
+							difficulty: key,
+							level: Number(values.sheets[key].level),
+							notesDesigner: values.sheets[key].notesDesigner.trim(),
+						})),
+					} satisfies CreateMusicInput,
+					jacketFile[0],
+				);
 			}
 			router.push(data ? `/musics/${data.music.id}` : "/musics");
 		} catch (error) {
-			if (uploadedJacket) {
-				try {
-					await deleteJacketAction(uploadedJacket);
-				} catch {
-					// Cleanup is best effort after a failed music mutation.
-				}
-			}
 			setSubmitError(
 				error instanceof Error ? error.message : "保存に失敗しました。",
 			);
