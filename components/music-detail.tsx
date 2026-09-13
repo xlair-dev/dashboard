@@ -22,9 +22,9 @@ const MusicSheetsTable = dynamic(
 );
 
 const difficultyLabels = {
-	easy: "Easy",
-	normal: "Normal",
-	hard: "Hard",
+	basic: "Basic",
+	advanced: "Advanced",
+	master: "Master",
 } as const;
 
 export default function MusicDetail({ data }: { data: MusicWithSheets }) {
