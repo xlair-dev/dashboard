@@ -3,6 +3,7 @@
 import {
 	type CreateMusicInput,
 	createMusic,
+	deleteJacket,
 	type MusicWithSheets,
 	type UpdateMusicInput,
 	updateMusic,
@@ -21,4 +22,10 @@ export async function updateMusicAction(
 	jacket?: File,
 ): Promise<MusicWithSheets> {
 	return updateMusic(musicId, input, jacket);
+}
+
+export async function deleteJacketAction(
+	musicId: string,
+): Promise<MusicWithSheets> {
+	return deleteJacket(musicId);
 }
