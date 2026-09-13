@@ -14,7 +14,7 @@ export default function MusicSheetsTable({
 }) {
 	return (
 		<Table
-			variant="borderless"
+			variant="container"
 			header={<Header counter={`(${sheets.length})`}>譜面一覧</Header>}
 			columnDefinitions={[
 				{ header: "難易度", cell: (item) => item.difficultyLabel },
