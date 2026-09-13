@@ -8,6 +8,7 @@ import SpaceBetween from "@cloudscape-design/components/space-between";
 import dynamic from "next/dynamic";
 
 import DashboardLayout from "@/components/dashboard-layout";
+import MusicBreadcrumbs from "@/components/music-breadcrumbs";
 import type { MusicWithSheets } from "@/lib/api";
 
 const MusicSheetsTable = dynamic(
@@ -32,10 +33,16 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 				header={
 					<Header
 						variant="h1"
-						actions={<Button href="/musics">楽曲一覧に戻る</Button>}
+						actions={<Button href={`/musics/${music.id}/edit`}>編集</Button>}
 					>
 						{music.title}
 					</Header>
+				}
+				breadcrumbs={
+					<MusicBreadcrumbs
+						current={music.title}
+						currentHref={`/musics/${encodeURIComponent(music.id)}`}
+					/>
 				}
 			>
 				<SpaceBetween size="l">
@@ -48,7 +55,9 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 							<DetailItem label="ジャケット" value={music.jacket} />
 							<DetailItem
 								label="登録日時"
-								value={new Date(music.registrationDate).toISOString()}
+								value={new Date(music.registrationDate).toLocaleDateString(
+									"ja-JP",
+								)}
 							/>
 							<DetailItem
 								label="テスト楽曲"
@@ -56,14 +65,12 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 							/>
 						</dl>
 					</Container>
-					<Container header={<Header variant="h2">譜面</Header>}>
-						<MusicSheetsTable
-							sheets={data.sheets.map((sheet) => ({
-								...sheet,
-								difficultyLabel: difficultyLabels[sheet.difficulty],
-							}))}
-						/>
-					</Container>
+					<MusicSheetsTable
+						sheets={data.sheets.map((sheet) => ({
+							...sheet,
+							difficultyLabel: difficultyLabels[sheet.difficulty],
+						}))}
+					/>
 				</SpaceBetween>
 			</ContentLayout>
 		</DashboardLayout>

@@ -14,13 +14,15 @@ export default function MusicSheetsTable({
 }) {
 	return (
 		<Table
+			className="px-4 sm:px-6"
+			variant="container"
+			header={<Header counter={`(${sheets.length})`}>譜面一覧</Header>}
 			columnDefinitions={[
 				{ header: "難易度", cell: (item) => item.difficultyLabel },
 				{ header: "レベル", cell: (item) => item.level },
 				{ header: "譜面制作者", cell: (item) => item.notesDesigner },
 			]}
 			items={sheets}
-			header={<Header counter={`(${sheets.length})`}>譜面一覧</Header>}
 			empty={<span>譜面がありません。</span>}
 		/>
 	);
