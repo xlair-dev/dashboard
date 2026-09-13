@@ -3,32 +3,22 @@
 import {
 	type CreateMusicInput,
 	createMusic,
-	deleteJacket,
 	type MusicWithSheets,
 	type UpdateMusicInput,
 	updateMusic,
-	uploadJacket,
 } from "@/lib/api";
 
 export async function createMusicAction(
 	input: CreateMusicInput,
+	jacket?: File,
 ): Promise<MusicWithSheets> {
-	return createMusic(input);
-}
-
-export async function uploadJacketAction(file: File) {
-	return uploadJacket(file);
-}
-
-export async function deleteJacketAction(
-	upload: Parameters<typeof deleteJacket>[0],
-) {
-	return deleteJacket(upload);
+	return createMusic(input, jacket);
 }
 
 export async function updateMusicAction(
 	musicId: string,
 	input: UpdateMusicInput,
+	jacket?: File,
 ): Promise<MusicWithSheets> {
-	return updateMusic(musicId, input);
+	return updateMusic(musicId, input, jacket);
 }

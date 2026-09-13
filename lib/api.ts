@@ -13,7 +13,6 @@ export type Sheet = {
 	level: number;
 	notesDesigner: string;
 };
-
 export type Music = {
 	id: string;
 	title: string;
@@ -24,17 +23,11 @@ export type Music = {
 	registrationDate: string;
 	isTest: boolean;
 };
-
-export type MusicWithSheets = {
-	music: Music;
-	sheets: Sheet[];
-};
-
+export type MusicWithSheets = { music: Music; sheets: Sheet[] };
 export type MusicListResponse = {
 	items: MusicWithSheets[];
 	nextCursor: string | null;
 };
-
 export type MusicFields = {
 	title: string;
 	artist: string;
@@ -44,7 +37,6 @@ export type MusicFields = {
 	registrationDate: string;
 	isTest: boolean;
 };
-
 export type CreateMusicInput = MusicFields & {
 	sheets: Array<{
 		difficulty: Sheet["difficulty"];
@@ -52,7 +44,6 @@ export type CreateMusicInput = MusicFields & {
 		notesDesigner: string;
 	}>;
 };
-
 export type UpdateMusicInput = MusicFields & {
 	sheets: Array<{
 		id: string;
@@ -60,16 +51,6 @@ export type UpdateMusicInput = MusicFields & {
 		level: number;
 		notesDesigner: string;
 	}>;
-};
-
-type JacketUploadResponse = {
-	jacketId: string;
-	jacketUrl: string;
-};
-
-export type UploadedJacket = {
-	jacketId: string;
-	jacketUrl: string;
 };
 
 async function getAccessToken(returnTo: string) {
@@ -85,10 +66,7 @@ async function getAccessToken(returnTo: string) {
 				AccessTokenErrorCode.SESSION_EXPIRED,
 			].includes(error.code as AccessTokenErrorCode)
 		) {
-			const loginParams = new URLSearchParams({
-				prompt: "login",
-				returnTo,
-			});
+			const loginParams = new URLSearchParams({ prompt: "login", returnTo });
 			redirect(`/auth/login?${loginParams.toString()}`);
 		}
 		throw error;
@@ -103,7 +81,6 @@ export async function fetchMusics(
 	if (searchParams.limit) params.set("limit", String(searchParams.limit));
 	const returnTo = `/musics${params.size ? `?${params.toString()}` : ""}`;
 	const accessToken = await getAccessToken(returnTo);
-
 	const response = await fetch(
 		`${process.env.API_BASE_URL}/admin/musics?${params.toString()}`,
 		{
@@ -111,11 +88,8 @@ export async function fetchMusics(
 			cache: "no-store",
 		},
 	);
-
-	if (!response.ok) {
+	if (!response.ok)
 		throw new Error(`Failed to fetch musics: ${response.status}`);
-	}
-
 	return response.json() as Promise<MusicListResponse>;
 }
 
@@ -128,86 +102,45 @@ export async function fetchMusic(musicId: string): Promise<MusicWithSheets> {
 			cache: "no-store",
 		},
 	);
-
-	if (!response.ok) {
+	if (!response.ok)
 		throw new Error(`Failed to fetch music: ${response.status}`);
-	}
-
 	return response.json() as Promise<MusicWithSheets>;
 }
 
 async function writeMusic(
 	path: string,
-	method: "POST",
 	body: CreateMusicInput | UpdateMusicInput,
+	jacket: File | undefined,
 	returnTo: string,
 ): Promise<MusicWithSheets> {
 	const accessToken = await getAccessToken(returnTo);
-	const response = await fetch(`${process.env.API_BASE_URL}${path}`, {
-		method,
-		headers: {
-			Authorization: `Bearer ${accessToken.token}`,
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify(body),
-		cache: "no-store",
-	});
-
-	if (!response.ok) {
-		throw new Error(
-			`Failed to ${method === "POST" ? "create" : "update"} music: ${response.status}`,
-		);
-	}
-
-	return response.json() as Promise<MusicWithSheets>;
-}
-
-export function createMusic(input: CreateMusicInput) {
-	return writeMusic("/admin/musics", "POST", input, "/musics/new");
-}
-
-export function updateMusic(musicId: string, input: UpdateMusicInput) {
-	return writeMusic(
-		`/admin/musics/${encodeURIComponent(musicId)}`,
-		"POST",
-		input,
-		`/musics/${musicId}/edit`,
-	);
-}
-
-export async function uploadJacket(file: File): Promise<UploadedJacket> {
-	if (
-		!(["image/jpeg", "image/png", "image/webp"] as string[]).includes(file.type)
-	)
-		throw new Error(
-			"ジャケット画像は JPEG、PNG、WebP のいずれかを選択してください。",
-		);
-	if (file.size > 5 * 1024 * 1024)
-		throw new Error("ジャケット画像は 5 MiB 以下にしてください。");
-	const accessToken = await getAccessToken("/musics");
 	const formData = new FormData();
-	formData.append("file", file);
-	const response = await fetch(`${process.env.API_BASE_URL}/admin/jackets`, {
+	formData.append("request", JSON.stringify(body));
+	if (jacket) formData.append("jacket", jacket);
+	const response = await fetch(`${process.env.API_BASE_URL}${path}`, {
 		method: "POST",
 		headers: { Authorization: `Bearer ${accessToken.token}` },
 		body: formData,
 		cache: "no-store",
 	});
 	if (!response.ok)
-		throw new Error(`Failed to upload jacket: ${response.status}`);
-	return (await response.json()) as JacketUploadResponse;
+		throw new Error(`Failed to write music: ${response.status}`);
+	return response.json() as Promise<MusicWithSheets>;
 }
 
-export async function deleteJacket(upload: UploadedJacket) {
-	const accessToken = await getAccessToken("/musics");
-	const response = await fetch(
-		`${process.env.API_BASE_URL}/admin/jackets/${encodeURIComponent(upload.jacketId)}`,
-		{
-			method: "DELETE",
-			headers: { Authorization: `Bearer ${accessToken.token}` },
-			cache: "no-store",
-		},
+export function createMusic(input: CreateMusicInput, jacket?: File) {
+	return writeMusic("/admin/musics", input, jacket, "/musics/new");
+}
+
+export function updateMusic(
+	musicId: string,
+	input: UpdateMusicInput,
+	jacket?: File,
+) {
+	return writeMusic(
+		`/admin/musics/${encodeURIComponent(musicId)}`,
+		input,
+		jacket,
+		`/musics/${musicId}/edit`,
 	);
-	if (!response.ok)
-		throw new Error(`Failed to delete jacket upload: ${response.status}`);
 }
