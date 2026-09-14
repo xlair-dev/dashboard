@@ -4,39 +4,13 @@ import Link from "@cloudscape-design/components/link";
 import Modal from "@cloudscape-design/components/modal";
 import SpaceBetween from "@cloudscape-design/components/space-between";
 import { useEffect, useRef, useState } from "react";
+import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 
 type PreviewType = "audio" | "chart";
 
 function proxyUrl(url: string) {
 	const path = new URL(url, window.location.origin).pathname;
 	return `/api/assets${path}`;
-}
-
-function chartDocument(svg: string) {
-	return `<!doctype html>
-<html lang="ja">
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-html, body { margin: 0; min-height: 100%; background: white; }
-body { overflow: auto; }
-#chart { transform-origin: top left; width: max-content; min-width: 100%; }
-#chart svg { display: block; width: auto; min-width: 100%; height: auto; }
-</style>
-</head>
-<body>
-<div id="chart">${svg}</div>
-<script>
-const chart = document.getElementById("chart");
-let scale = 1;
-document.addEventListener("wheel", (event) => {
-  event.preventDefault();
-  scale = Math.min(4, Math.max(0.25, scale * Math.pow(1.0015, -event.deltaY)));
-  chart.style.transform = "scale(" + scale + ")";
-}, { passive: false });
-</script>
-</body>
-</html>`;
 }
 
 export default function AssetPreview({
@@ -53,6 +27,7 @@ export default function AssetPreview({
 	const [isOpen, setIsOpen] = useState(false);
 	const [source, setSource] = useState<string>();
 	const [svg, setSvg] = useState<string>();
+	const [chartSource, setChartSource] = useState<string>();
 	const [error, setError] = useState<string>();
 	const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -95,6 +70,18 @@ export default function AssetPreview({
 		return () => controller.abort();
 	}, [isOpen, source, type]);
 
+	useEffect(() => {
+		if (!svg) {
+			setChartSource(undefined);
+			return;
+		}
+		const objectUrl = URL.createObjectURL(
+			new Blob([svg], { type: "image/svg+xml" }),
+		);
+		setChartSource(objectUrl);
+		return () => URL.revokeObjectURL(objectUrl);
+	}, [svg]);
+
 	if (!source) return null;
 	return (
 		<>
@@ -121,13 +108,22 @@ export default function AssetPreview({
 					{type === "chart" && !error && !svg ? (
 						<p>譜面を読み込み中...</p>
 					) : null}
-					{type === "chart" && svg ? (
-						<iframe
-							title="譜面プレビュー"
-							sandbox="allow-scripts"
-							srcDoc={chartDocument(svg)}
-							className="h-[32rem] w-full border-0"
-						/>
+					{type === "chart" && chartSource ? (
+						<TransformWrapper
+							centerOnInit
+							minScale={0.5}
+							maxScale={4}
+							wheel={{ disabled: true }}
+						>
+							<TransformComponent
+								wrapperClass="h-[32rem] w-full cursor-grab bg-white active:cursor-grabbing"
+								contentClass="min-h-full min-w-full"
+							>
+								{/* The SVG is generated locally and cannot be optimized by next/image. */}
+								{/* biome-ignore lint/performance/noImgElement: Blob URLs are not supported by next/image optimization. */}
+								<img alt="" className="block max-w-none" src={chartSource} />
+							</TransformComponent>
+						</TransformWrapper>
 					) : null}
 				</SpaceBetween>
 			</Modal>
