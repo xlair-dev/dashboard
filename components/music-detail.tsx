@@ -9,6 +9,7 @@ import SpaceBetween from "@cloudscape-design/components/space-between";
 import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 import { AssetDisplay, chartAssetDisplay } from "@/components/asset-display";
+import AssetPreview from "@/components/asset-preview";
 import DashboardLayout from "@/components/dashboard-layout";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
 import type { MusicWithSheets } from "@/lib/api";
@@ -98,6 +99,7 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 										url={music.audio?.url ?? null}
 										updatedAt={music.audio?.updatedAt ?? null}
 									/>
+									<AssetPreview type="audio" url={music.audio?.url} />
 								</div>
 								{data.sheets.map((sheet) => (
 									<div
@@ -108,6 +110,7 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 											sheet,
 											difficultyLabels[sheet.difficulty],
 										)}
+										<AssetPreview type="chart" url={sheet.chart?.url} />
 									</div>
 								))}
 							</div>

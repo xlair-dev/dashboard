@@ -28,6 +28,7 @@ import {
 	uploadJacketAction,
 } from "@/app/musics/actions";
 import { AssetDisplay, PendingAssetDisplay } from "@/components/asset-display";
+import AssetPreview from "@/components/asset-preview";
 import DashboardLayout from "@/components/dashboard-layout";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
 import type {
@@ -555,6 +556,9 @@ export default function MusicForm({
 												onRemove={() => setAudioFile([])}
 											/>
 										) : null}
+										{audioFile[0] ? (
+											<AssetPreview type="audio" file={audioFile[0]} />
+										) : null}
 										{!audioFile.length && values.audio ? (
 											<SpaceBetween size="s">
 												<AssetDisplay
@@ -569,6 +573,7 @@ export default function MusicForm({
 												>
 													音源を削除
 												</Button>
+												<AssetPreview type="audio" url={values.audio} />
 											</SpaceBetween>
 										) : null}
 									</SpaceBetween>
@@ -641,6 +646,12 @@ export default function MusicForm({
 																/>
 															) : null}
 															{chartFiles[key][0] ? (
+																<AssetPreview
+																	type="chart"
+																	file={chartFiles[key][0]}
+																/>
+															) : null}
+															{chartFiles[key][0] ? (
 																<PendingAssetDisplay
 																	type="chart"
 																	fileName={chartFiles[key][0].name}
@@ -673,6 +684,10 @@ export default function MusicForm({
 																	>
 																		譜面を削除
 																	</Button>
+																	<AssetPreview
+																		type="chart"
+																		url={sheet.chart}
+																	/>
 																</SpaceBetween>
 															) : null}
 														</SpaceBetween>
