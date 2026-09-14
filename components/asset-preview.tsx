@@ -1,6 +1,7 @@
 "use client";
 
-import Button from "@cloudscape-design/components/button";
+import Link from "@cloudscape-design/components/link";
+import Modal from "@cloudscape-design/components/modal";
 import SpaceBetween from "@cloudscape-design/components/space-between";
 import { useEffect, useState } from "react";
 
@@ -15,10 +16,12 @@ export default function AssetPreview({
 	type,
 	url,
 	file,
+	label,
 }: {
 	type: PreviewType;
 	url?: string | null;
 	file?: File;
+	label: string;
 }) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [source, setSource] = useState<string>();
@@ -62,25 +65,33 @@ export default function AssetPreview({
 
 	if (!source) return null;
 	return (
-		<SpaceBetween size="s">
-			<Button onClick={() => setIsOpen((current) => !current)}>
-				{isOpen ? "プレビューを閉じる" : "プレビューを表示"}
-			</Button>
-			{/* Audio previews contain no spoken content requiring captions. */}
-			{/* biome-ignore lint/a11y/useMediaCaption: The preview is instrumental audio. */}
-			{isOpen && type === "audio" ? <audio controls src={source} /> : null}
-			{isOpen && type === "chart" && error ? <p>{error}</p> : null}
-			{isOpen && type === "chart" && !error && !svg ? (
-				<p>譜面を読み込み中...</p>
-			) : null}
-			{isOpen && svg ? (
-				<iframe
-					title="譜面プレビュー"
-					sandbox=""
-					srcDoc={svg}
-					className="h-[32rem] w-full border-0"
-				/>
-			) : null}
-		</SpaceBetween>
+		<>
+			<Link onFollow={() => setIsOpen(true)}>{label}</Link>
+			<Modal
+				visible={isOpen}
+				onDismiss={() => setIsOpen(false)}
+				header={label}
+				closeAriaLabel="プレビューを閉じる"
+				size="max"
+			>
+				<SpaceBetween size="s">
+					{/* Audio previews contain no spoken content requiring captions. */}
+					{/* biome-ignore lint/a11y/useMediaCaption: The preview is instrumental audio. */}
+					{type === "audio" ? <audio controls src={source} /> : null}
+					{type === "chart" && error ? <p>{error}</p> : null}
+					{type === "chart" && !error && !svg ? (
+						<p>譜面を読み込み中...</p>
+					) : null}
+					{type === "chart" && svg ? (
+						<iframe
+							title="譜面プレビュー"
+							sandbox=""
+							srcDoc={svg}
+							className="h-[32rem] w-full border-0"
+						/>
+					) : null}
+				</SpaceBetween>
+			</Modal>
+		</>
 	);
 }

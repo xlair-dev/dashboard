@@ -98,8 +98,13 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 										type="audio"
 										url={music.audio?.url ?? null}
 										updatedAt={music.audio?.updatedAt ?? null}
+										showLabel={false}
 									/>
-									<AssetPreview type="audio" url={music.audio?.url} />
+									<AssetPreview
+										type="audio"
+										url={music.audio?.url}
+										label="音源"
+									/>
 								</div>
 								{data.sheets.map((sheet) => (
 									<div
@@ -109,8 +114,13 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 										{chartAssetDisplay(
 											sheet,
 											difficultyLabels[sheet.difficulty],
+											false,
 										)}
-										<AssetPreview type="chart" url={sheet.chart?.url} />
+										<AssetPreview
+											type="chart"
+											url={sheet.chart?.url}
+											label={difficultyLabels[sheet.difficulty]}
+										/>
 									</div>
 								))}
 							</div>

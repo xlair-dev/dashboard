@@ -557,7 +557,11 @@ export default function MusicForm({
 											/>
 										) : null}
 										{audioFile[0] ? (
-											<AssetPreview type="audio" file={audioFile[0]} />
+											<AssetPreview
+												type="audio"
+												file={audioFile[0]}
+												label="音源"
+											/>
 										) : null}
 										{!audioFile.length && values.audio ? (
 											<SpaceBetween size="s">
@@ -565,6 +569,7 @@ export default function MusicForm({
 													type="audio"
 													url={values.audio}
 													updatedAt={data?.music.audio?.updatedAt ?? null}
+													showLabel={false}
 												/>
 												<Button
 													loading={isDeletingAudio}
@@ -573,7 +578,11 @@ export default function MusicForm({
 												>
 													音源を削除
 												</Button>
-												<AssetPreview type="audio" url={values.audio} />
+												<AssetPreview
+													type="audio"
+													url={values.audio}
+													label="音源"
+												/>
 											</SpaceBetween>
 										) : null}
 									</SpaceBetween>
@@ -649,6 +658,7 @@ export default function MusicForm({
 																<AssetPreview
 																	type="chart"
 																	file={chartFiles[key][0]}
+																	label={label}
 																/>
 															) : null}
 															{chartFiles[key][0] ? (
@@ -674,6 +684,7 @@ export default function MusicForm({
 																			)?.chart?.updatedAt ?? null
 																		}
 																		label={label}
+																		showLabel={false}
 																	/>
 																	<Button
 																		loading={deletingChart === key}
@@ -687,6 +698,7 @@ export default function MusicForm({
 																	<AssetPreview
 																		type="chart"
 																		url={sheet.chart}
+																		label={label}
 																	/>
 																</SpaceBetween>
 															) : null}
