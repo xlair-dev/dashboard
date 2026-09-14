@@ -9,31 +9,43 @@ import {
 	type MusicWithSheets,
 	type UpdateMusicInput,
 	updateMusic,
+	uploadAudio,
+	uploadChart,
+	uploadJacket,
 } from "@/lib/api";
 
-export async function createMusicAction(
+export async function createMusicMetadataAction(
 	input: CreateMusicInput,
-	jacket?: File,
-	audio?: File,
-	charts: Array<{
-		difficulty: "basic" | "advanced" | "master";
-		file: File;
-	}> = [],
 ): Promise<MusicWithSheets> {
-	return createMusic(input, jacket, audio, charts);
+	return createMusic(input);
 }
 
-export async function updateMusicAction(
+export async function updateMusicMetadataAction(
 	musicId: string,
 	input: UpdateMusicInput,
-	jacket?: File,
-	audio?: File,
-	charts: Array<{
-		difficulty: "basic" | "advanced" | "master";
-		file: File;
-	}> = [],
 ): Promise<MusicWithSheets> {
-	return updateMusic(musicId, input, jacket, audio, charts);
+	return updateMusic(musicId, input);
+}
+
+export async function uploadJacketAction(
+	musicId: string,
+	file: File,
+): Promise<MusicWithSheets> {
+	return uploadJacket(musicId, file, `/musics/${musicId}/edit`);
+}
+
+export async function uploadAudioAction(
+	musicId: string,
+	file: File,
+): Promise<MusicWithSheets> {
+	return uploadAudio(musicId, file, `/musics/${musicId}/edit`);
+}
+
+export async function uploadChartAction(
+	sheetId: string,
+	file: File,
+): Promise<MusicWithSheets> {
+	return uploadChart(sheetId, file, `/musics/edit`);
 }
 
 export async function deleteJacketAction(

@@ -142,9 +142,6 @@ export async function fetchMusic(musicId: string): Promise<MusicWithSheets> {
 async function writeMusic(
 	path: string,
 	body: CreateMusicInput | UpdateMusicInput,
-	jacket: File | undefined,
-	audio: File | undefined,
-	charts: Array<{ difficulty: Sheet["difficulty"]; file: File }>,
 	returnTo: string,
 ): Promise<MusicWithSheets> {
 	const accessToken = await getAccessToken(returnTo);
@@ -159,21 +156,10 @@ async function writeMusic(
 	});
 	if (!response.ok)
 		throw new Error(`Failed to write music: ${response.status}`);
-	const music = normalizeMusic((await response.json()) as MusicWithSheets);
-	let result = music;
-	if (jacket) result = await uploadJacket(result.music.id, jacket, returnTo);
-	if (audio) result = await uploadAudio(result.music.id, audio, returnTo);
-	for (const chart of charts) {
-		const sheet = result.sheets.find(
-			(item) => item.difficulty === chart.difficulty,
-		);
-		if (!sheet) throw new Error(`Sheet not found: ${chart.difficulty}`);
-		result = await uploadChart(sheet.id, chart.file, returnTo);
-	}
-	return result;
+	return normalizeMusic((await response.json()) as MusicWithSheets);
 }
 
-async function uploadJacket(
+export async function uploadJacket(
 	musicId: string,
 	jacket: File,
 	returnTo: string,
@@ -196,7 +182,7 @@ async function uploadJacket(
 	return normalizeMusic((await response.json()) as MusicWithSheets);
 }
 
-async function uploadAudio(
+export async function uploadAudio(
 	musicId: string,
 	audio: File,
 	returnTo: string,
@@ -219,7 +205,7 @@ async function uploadAudio(
 	return normalizeMusic((await response.json()) as MusicWithSheets);
 }
 
-async function uploadChart(
+export async function uploadChart(
 	sheetId: string,
 	chart: File,
 	returnTo: string,
@@ -289,35 +275,14 @@ export async function deleteChart(sheetId: string): Promise<MusicWithSheets> {
 	return normalizeMusic((await response.json()) as MusicWithSheets);
 }
 
-export function createMusic(
-	input: CreateMusicInput,
-	jacket?: File,
-	audio?: File,
-	charts: Array<{ difficulty: Sheet["difficulty"]; file: File }> = [],
-) {
-	return writeMusic(
-		"/admin/musics",
-		input,
-		jacket,
-		audio,
-		charts,
-		"/musics/new",
-	);
+export function createMusic(input: CreateMusicInput) {
+	return writeMusic("/admin/musics", input, "/musics/new");
 }
 
-export function updateMusic(
-	musicId: string,
-	input: UpdateMusicInput,
-	jacket?: File,
-	audio?: File,
-	charts: Array<{ difficulty: Sheet["difficulty"]; file: File }> = [],
-) {
+export function updateMusic(musicId: string, input: UpdateMusicInput) {
 	return writeMusic(
 		`/admin/musics/${encodeURIComponent(musicId)}`,
 		input,
-		jacket,
-		audio,
-		charts,
 		`/musics/${musicId}/edit`,
 	);
 }
