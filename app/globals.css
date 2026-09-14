@@ -1,1 +1,7 @@
 @import "tailwindcss";
+
+@layer components {
+	.dashboard-layout :has(> .dashboard-content-header) {
+		@apply sticky top-0 z-10 bg-white;
+	}
+}
