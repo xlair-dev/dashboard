@@ -10,6 +10,7 @@ import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 import { AssetDisplay, chartAssetDisplay } from "@/components/asset-display";
 import DashboardLayout from "@/components/dashboard-layout";
+import DeleteMusicButton from "@/components/delete-music-button";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
 import type { MusicWithSheets } from "@/lib/api";
 
@@ -41,7 +42,12 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 				header={
 					<Header
 						variant="h1"
-						actions={<Button href={`/musics/${music.id}/edit`}>編集</Button>}
+						actions={
+							<SpaceBetween direction="horizontal" size="xs">
+								<Button href={`/musics/${music.id}/edit`}>編集</Button>
+								<DeleteMusicButton musicId={music.id} />
+							</SpaceBetween>
+						}
 					>
 						{music.title}
 					</Header>

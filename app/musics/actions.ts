@@ -6,6 +6,7 @@ import {
 	deleteAudio,
 	deleteChart,
 	deleteJacket,
+	deleteMusic,
 	type MusicWithSheets,
 	type UpdateMusicInput,
 	updateMusic,
@@ -64,4 +65,8 @@ export async function deleteChartAction(
 	sheetId: string,
 ): Promise<MusicWithSheets> {
 	return deleteChart(sheetId);
+}
+
+export async function deleteMusicAction(musicId: string): Promise<void> {
+	return deleteMusic(musicId);
 }
