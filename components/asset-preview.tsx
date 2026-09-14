@@ -3,7 +3,7 @@
 import Link from "@cloudscape-design/components/link";
 import Modal from "@cloudscape-design/components/modal";
 import SpaceBetween from "@cloudscape-design/components/space-between";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type PreviewType = "audio" | "chart";
 
@@ -27,6 +27,7 @@ export default function AssetPreview({
 	const [source, setSource] = useState<string>();
 	const [svg, setSvg] = useState<string>();
 	const [error, setError] = useState<string>();
+	const audioRef = useRef<HTMLAudioElement>(null);
 
 	useEffect(() => {
 		if (file) {
@@ -36,6 +37,10 @@ export default function AssetPreview({
 		}
 		setSource(url ? proxyUrl(url) : undefined);
 	}, [file, url]);
+
+	useEffect(() => {
+		if (!isOpen) audioRef.current?.pause();
+	}, [isOpen]);
 
 	useEffect(() => {
 		if (!isOpen || type !== "chart" || !source) return;
@@ -78,8 +83,13 @@ export default function AssetPreview({
 			>
 				<SpaceBetween size="s">
 					{/* Audio previews contain no spoken content requiring captions. */}
-					{/* biome-ignore lint/a11y/useMediaCaption: The preview is instrumental audio. */}
-					{type === "audio" ? <audio controls src={source} /> : null}
+					{type === "audio" ? (
+						<>
+							{/* Audio previews contain no spoken content requiring captions. */}
+							{/* biome-ignore lint/a11y/useMediaCaption: The preview is instrumental audio. */}
+							<audio ref={audioRef} controls src={source} />
+						</>
+					) : null}
 					{type === "chart" && error ? <p>{error}</p> : null}
 					{type === "chart" && !error && !svg ? (
 						<p>譜面を読み込み中...</p>
