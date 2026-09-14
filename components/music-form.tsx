@@ -30,7 +30,6 @@ import {
 import { AssetDisplay, PendingAssetDisplay } from "@/components/asset-display";
 import DashboardLayout from "@/components/dashboard-layout";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
-import StickyPageHeader from "@/components/sticky-page-header";
 import type {
 	CreateMusicInput,
 	Genre,
@@ -350,7 +349,16 @@ export default function MusicForm({
 	}
 
 	return (
-		<DashboardLayout activeHref="/musics">
+		<DashboardLayout
+			activeHref="/musics"
+			breadcrumbs={
+				<MusicBreadcrumbs
+					current={title}
+					currentHref={data ? `/musics/${data.music.id}/edit` : "/musics/new"}
+				/>
+			}
+			contentHeader={<Header variant="h1">{title}</Header>}
+		>
 			{errorNotification ? (
 				<div className="fixed inset-x-4 top-16 z-50 sm:left-auto sm:w-96">
 					<Flashbar
@@ -368,19 +376,7 @@ export default function MusicForm({
 					/>
 				</div>
 			) : null}
-			<ContentLayout
-				breadcrumbs={
-					<MusicBreadcrumbs
-						current={title}
-						currentHref={data ? `/musics/${data.music.id}/edit` : "/musics/new"}
-					/>
-				}
-				header={
-					<StickyPageHeader>
-						<Header variant="h1">{title}</Header>
-					</StickyPageHeader>
-				}
-			>
+			<ContentLayout>
 				<form onSubmit={handleSubmit}>
 					<Form
 						actions={

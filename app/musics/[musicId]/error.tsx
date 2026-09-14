@@ -9,21 +9,17 @@ import SpaceBetween from "@cloudscape-design/components/space-between";
 
 import DashboardLayout from "@/components/dashboard-layout";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
-import StickyPageHeader from "@/components/sticky-page-header";
 
 export default function MusicDetailError({ reset }: { reset: () => void }) {
 	return (
-		<DashboardLayout activeHref="/musics">
-			<ContentLayout
-				breadcrumbs={
-					<MusicBreadcrumbs current="楽曲詳細" currentHref="/musics" />
-				}
-				header={
-					<StickyPageHeader>
-						<Header variant="h1">楽曲管理</Header>
-					</StickyPageHeader>
-				}
-			>
+		<DashboardLayout
+			activeHref="/musics"
+			breadcrumbs={
+				<MusicBreadcrumbs current="楽曲詳細" currentHref="/musics" />
+			}
+			contentHeader={<Header variant="h1">楽曲管理</Header>}
+		>
+			<ContentLayout>
 				<Container>
 					<Alert type="error" header="楽曲を取得できませんでした">
 						楽曲が存在しないか、一時的に取得できません。時間をおいて再試行してください。
