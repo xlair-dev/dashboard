@@ -105,6 +105,10 @@ async function getAccessToken(returnTo: string) {
 	}
 }
 
+export async function ensureAuthenticated(returnTo: string) {
+	await getAccessToken(returnTo);
+}
+
 export async function fetchMusics(
 	searchParams: { cursor?: string; limit?: number } = {},
 ): Promise<MusicListResponse> {
