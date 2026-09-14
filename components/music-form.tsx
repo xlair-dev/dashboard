@@ -64,6 +64,10 @@ const genres: Array<{ value: Genre; label: string }> = [
 	{ value: "OTHER", label: "OTHER" },
 ];
 
+const MAX_JACKET_SIZE = 5 * 1024 * 1024;
+const MAX_AUDIO_SIZE = 30 * 1024 * 1024;
+const MAX_CHART_SIZE = 5 * 1024 * 1024;
+
 function isPositiveSingleDecimal(value: string) {
 	return /^\d+(\.\d)?$/.test(value) && Number(value) > 0;
 }
@@ -117,6 +121,7 @@ export default function MusicForm({
 		advanced: [],
 		master: [],
 	});
+	const [assetErrors, setAssetErrors] = useState<Record<string, string>>({});
 	const [jacketPreviewUrl, setJacketPreviewUrl] = useState<string>();
 	const router = useRouter();
 
@@ -133,13 +138,22 @@ export default function MusicForm({
 	}, [jacketFile]);
 
 	const isEdit = Boolean(data);
+	function setAssetError(field: string, message?: string) {
+		setAssetErrors((current) => {
+			const next = { ...current };
+			if (message) next[field] = message;
+			else delete next[field];
+			return next;
+		});
+	}
+
 	const updateValue = (
 		key: keyof Omit<FormValues, "sheets">,
 		value: string | boolean,
 	) => setValues((current) => ({ ...current, [key]: value }));
 
 	function validate() {
-		const nextErrors: Record<string, string> = {};
+		const nextErrors: Record<string, string> = { ...assetErrors };
 		if (!values.title.trim()) nextErrors.title = "タイトルを入力してください。";
 		if (!values.artist.trim())
 			nextErrors.artist = "アーティストを入力してください。";
@@ -385,13 +399,26 @@ export default function MusicForm({
 								</SpaceBetween>
 							</Container>
 							<Container header={<Header variant="h2">アセット</Header>}>
-								<FormField label="ジャケット" errorText={errors.jacket}>
+								<FormField label="ジャケット" errorText={assetErrors.jacket}>
 									<SpaceBetween size="s">
 										{!jacketFile.length && !values.jacket ? (
 											<FileUpload
 												accept="image/jpeg,image/png,image/webp"
 												value={jacketFile}
-												onChange={({ detail }) => setJacketFile(detail.value)}
+												constraintText="最大 5 MiB"
+												onChange={({ detail }) => {
+													const file = detail.value[0];
+													if (file && file.size > MAX_JACKET_SIZE) {
+														setJacketFile([]);
+														setAssetError(
+															"jacket",
+															"ジャケットは 5 MiB 以下にしてください。",
+														);
+														return;
+													}
+													setJacketFile(detail.value);
+													setAssetError("jacket");
+												}}
 												i18nStrings={{
 													uploadButtonText: () => "画像を選択",
 													dropzoneText: () => "画像をここにドロップ",
@@ -444,13 +471,26 @@ export default function MusicForm({
 										) : null}
 									</SpaceBetween>
 								</FormField>
-								<FormField label="音源">
+								<FormField label="音源" errorText={assetErrors.audio}>
 									<SpaceBetween size="s">
 										{!audioFile.length && !values.audio ? (
 											<FileUpload
 												accept="audio/wav"
 												value={audioFile}
-												onChange={({ detail }) => setAudioFile(detail.value)}
+												constraintText="WAV、最大 30 MiB"
+												onChange={({ detail }) => {
+													const file = detail.value[0];
+													if (file && file.size > MAX_AUDIO_SIZE) {
+														setAudioFile([]);
+														setAssetError(
+															"audio",
+															"音源は 30 MiB 以下にしてください。",
+														);
+														return;
+													}
+													setAudioFile(detail.value);
+													setAssetError("audio");
+												}}
 												i18nStrings={{
 													uploadButtonText: () => "音源を選択",
 													dropzoneText: () => "WAV ファイルをここにドロップ",
@@ -515,18 +555,36 @@ export default function MusicForm({
 															}
 														/>
 													</FormField>
-													<FormField label="譜面ファイル">
+													<FormField
+														label="譜面ファイル"
+														errorText={assetErrors[`chart.${key}`]}
+													>
 														<SpaceBetween size="s">
 															{!chartFiles[key].length && !sheet.chart ? (
 																<FileUpload
 																	accept=".sus"
 																	value={chartFiles[key]}
-																	onChange={({ detail }) =>
+																	constraintText="SUS、最大 5 MiB"
+																	onChange={({ detail }) => {
+																		const file = detail.value[0];
+																		const field = `chart.${key}`;
+																		if (file && file.size > MAX_CHART_SIZE) {
+																			setChartFiles((current) => ({
+																				...current,
+																				[key]: [],
+																			}));
+																			setAssetError(
+																				field,
+																				`${label} の譜面ファイルは 5 MiB 以下にしてください。`,
+																			);
+																			return;
+																		}
 																		setChartFiles((current) => ({
 																			...current,
 																			[key]: detail.value,
-																		}))
-																	}
+																		}));
+																		setAssetError(field);
+																	}}
 																	i18nStrings={{
 																		uploadButtonText: () => "譜面を選択",
 																		dropzoneText: () =>
