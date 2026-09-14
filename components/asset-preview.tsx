@@ -66,11 +66,13 @@ export default function AssetPreview({
 	if (!source) return null;
 	return (
 		<>
-			<Link onFollow={() => setIsOpen(true)}>{label}</Link>
+			<Link className="font-bold no-underline" onFollow={() => setIsOpen(true)}>
+				{label}
+			</Link>
 			<Modal
 				visible={isOpen}
 				onDismiss={() => setIsOpen(false)}
-				header={label}
+				header={`${label}プレビュー`}
 				closeAriaLabel="プレビューを閉じる"
 				size="large"
 			>

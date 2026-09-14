@@ -107,7 +107,7 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 									>
 										{chartAssetDisplay(
 											sheet,
-											difficultyLabels[sheet.difficulty],
+											`${difficultyLabels[sheet.difficulty]} 譜面`,
 										)}
 									</div>
 								))}

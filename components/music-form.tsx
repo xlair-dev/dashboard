@@ -653,7 +653,7 @@ export default function MusicForm({
 																<AssetPreview
 																	type="chart"
 																	file={chartFiles[key][0]}
-																	label={label}
+																	label={`${label} 譜面`}
 																/>
 															) : null}
 															{chartFiles[key][0] ? (
@@ -678,7 +678,7 @@ export default function MusicForm({
 																				(item) => item.difficulty === key,
 																			)?.chart?.updatedAt ?? null
 																		}
-																		label={label}
+																		label={`${label} 譜面`}
 																		preview="chart"
 																	/>
 																	<Button
