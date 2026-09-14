@@ -379,10 +379,11 @@ export default function MusicForm({
 				<form onSubmit={handleSubmit}>
 					<Form
 						actions={
-							<SpaceBetween direction="horizontal" size="s">
+							<SpaceBetween direction="horizontal" size="s" alignItems="center">
 								{saveProgress ? (
-									<div className="min-w-0 flex-1">
+									<div className="w-full min-w-0 flex-1">
 										<ProgressBar
+											className="w-full"
 											value={(saveProgress.current / saveProgress.total) * 100}
 											label={saveProgress.label}
 											description={`${saveProgress.current} / ${saveProgress.total}`}
