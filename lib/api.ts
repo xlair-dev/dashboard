@@ -286,3 +286,17 @@ export function updateMusic(musicId: string, input: UpdateMusicInput) {
 		`/musics/${musicId}/edit`,
 	);
 }
+
+export async function deleteMusic(musicId: string): Promise<void> {
+	const accessToken = await getAccessToken(`/musics/${musicId}`);
+	const response = await fetch(
+		`${process.env.API_BASE_URL}/admin/musics/${encodeURIComponent(musicId)}`,
+		{
+			method: "DELETE",
+			headers: { Authorization: `Bearer ${accessToken.token}` },
+			cache: "no-store",
+		},
+	);
+	if (!response.ok)
+		throw new Error(`Failed to delete music: ${response.status}`);
+}

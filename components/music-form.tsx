@@ -29,6 +29,7 @@ import {
 } from "@/app/musics/actions";
 import { AssetDisplay, PendingAssetDisplay } from "@/components/asset-display";
 import DashboardLayout from "@/components/dashboard-layout";
+import DeleteMusicButton from "@/components/delete-music-button";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
 import type {
 	CreateMusicInput,
@@ -378,8 +379,16 @@ export default function MusicForm({
 				) : null}
 				<form onSubmit={handleSubmit}>
 					<Form
+						secondaryActions={
+							data ? (
+								<DeleteMusicButton
+									musicId={data.music.id}
+									disabled={isSubmitting}
+								/>
+							) : null
+						}
 						actions={
-							<SpaceBetween direction="horizontal" size="s" alignItems="center">
+							<div className="flex flex-wrap items-center gap-4">
 								{saveProgress ? (
 									<div className="w-full min-w-0 flex-1">
 										<ProgressBar
@@ -390,17 +399,22 @@ export default function MusicForm({
 										/>
 									</div>
 								) : null}
-								<Button href={data ? `/musics/${data.music.id}` : "/musics"}>
-									キャンセル
-								</Button>
-								<Button
-									variant="primary"
-									loading={isSubmitting}
-									disabled={isSubmitting}
-								>
-									保存
-								</Button>
-							</SpaceBetween>
+								<div className="ml-auto flex items-center gap-3">
+									<Button
+										href={data ? `/musics/${data.music.id}` : "/musics"}
+										disabled={isSubmitting}
+									>
+										キャンセル
+									</Button>
+									<Button
+										variant="primary"
+										loading={isSubmitting}
+										disabled={isSubmitting}
+									>
+										保存
+									</Button>
+								</div>
+							</div>
 						}
 					>
 						<SpaceBetween size="l">
