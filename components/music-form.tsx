@@ -19,6 +19,8 @@ import { useEffect, useState } from "react";
 
 import {
 	createMusicAction,
+	deleteAudioAction,
+	deleteChartAction,
 	deleteJacketAction,
 	updateMusicAction,
 } from "@/app/musics/actions";
@@ -32,13 +34,19 @@ import type {
 } from "@/lib/api";
 
 type Difficulty = "basic" | "advanced" | "master";
-type SheetDraft = { id?: string; level: string; notesDesigner: string };
+type SheetDraft = {
+	id?: string;
+	level: string;
+	notesDesigner: string;
+	chart: string | null;
+};
 type FormValues = {
 	title: string;
 	artist: string;
 	bpm: string;
 	genre: Genre;
 	jacket: string | null;
+	audio: string | null;
 	registrationDate: string;
 	isTest: boolean;
 	sheets: Record<Difficulty, SheetDraft>;
@@ -70,6 +78,7 @@ function initialValues(data?: MusicWithSheets): FormValues {
 					id: sheet?.id,
 					level: sheet ? String(sheet.level) : "",
 					notesDesigner: sheet?.notesDesigner ?? "",
+					chart: sheet?.src ?? null,
 				},
 			];
 		}),
@@ -80,6 +89,7 @@ function initialValues(data?: MusicWithSheets): FormValues {
 		bpm: data ? String(data.music.bpm) : "",
 		genre: data?.music.genre ?? "ORIGINAL",
 		jacket: data?.music.jacket || null,
+		audio: data?.music.music || null,
 		registrationDate: data?.music.registrationDate.slice(0, 10) ?? "",
 		isTest: data?.music.isTest ?? false,
 		sheets,
@@ -98,7 +108,15 @@ export default function MusicForm({
 	const [submitError, setSubmitError] = useState<string>();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isDeletingJacket, setIsDeletingJacket] = useState(false);
+	const [isDeletingAudio, setIsDeletingAudio] = useState(false);
+	const [deletingChart, setDeletingChart] = useState<Difficulty>();
 	const [jacketFile, setJacketFile] = useState<File[]>([]);
+	const [audioFile, setAudioFile] = useState<File[]>([]);
+	const [chartFiles, setChartFiles] = useState<Record<Difficulty, File[]>>({
+		basic: [],
+		advanced: [],
+		master: [],
+	});
 	const [jacketPreviewUrl, setJacketPreviewUrl] = useState<string>();
 	const router = useRouter();
 
@@ -174,6 +192,12 @@ export default function MusicForm({
 						})),
 					} satisfies UpdateMusicInput,
 					jacketFile[0],
+					audioFile[0],
+					difficulties.flatMap(({ key }) =>
+						chartFiles[key][0]
+							? [{ difficulty: key, file: chartFiles[key][0] }]
+							: [],
+					),
 				);
 			} else {
 				await createMusicAction(
@@ -186,6 +210,12 @@ export default function MusicForm({
 						})),
 					} satisfies CreateMusicInput,
 					jacketFile[0],
+					audioFile[0],
+					difficulties.flatMap(({ key }) =>
+						chartFiles[key][0]
+							? [{ difficulty: key, file: chartFiles[key][0] }]
+							: [],
+					),
 				);
 			}
 			router.push(data ? `/musics/${data.music.id}` : "/musics");
@@ -214,6 +244,45 @@ export default function MusicForm({
 			);
 		} finally {
 			setIsDeletingJacket(false);
+		}
+	}
+
+	async function handleDeleteAudio() {
+		if (!data) return;
+		setIsDeletingAudio(true);
+		try {
+			await deleteAudioAction(data.music.id);
+			setValues((current) => ({ ...current, audio: null }));
+		} catch (error) {
+			setSubmitError(
+				error instanceof Error ? error.message : "音源を削除できませんでした。",
+			);
+		} finally {
+			setIsDeletingAudio(false);
+		}
+	}
+
+	async function handleDeleteChart(key: Difficulty) {
+		const sheetId = values.sheets[key].id;
+		if (!sheetId) return;
+		setDeletingChart(key);
+		try {
+			await deleteChartAction(sheetId);
+			setValues((current) => ({
+				...current,
+				sheets: {
+					...current.sheets,
+					[key]: { ...current.sheets[key], chart: null },
+				},
+			}));
+		} catch (error) {
+			setSubmitError(
+				error instanceof Error
+					? error.message
+					: "譜面ファイルを削除できませんでした。",
+			);
+		} finally {
+			setDeletingChart(undefined);
 		}
 	}
 
@@ -375,6 +444,48 @@ export default function MusicForm({
 										) : null}
 									</SpaceBetween>
 								</FormField>
+								<FormField label="音源">
+									<SpaceBetween size="s">
+										{!audioFile.length && !values.audio ? (
+											<FileUpload
+												accept="audio/wav"
+												value={audioFile}
+												onChange={({ detail }) => setAudioFile(detail.value)}
+												i18nStrings={{
+													uploadButtonText: () => "音源を選択",
+													dropzoneText: () => "WAV ファイルをここにドロップ",
+													removeFileAriaLabel: () => "音源を削除",
+												}}
+											/>
+										) : null}
+										{audioFile[0] ? (
+											<Container>
+												<SpaceBetween
+													direction="horizontal"
+													size="s"
+													alignItems="center"
+												>
+													<span className="break-all">{audioFile[0].name}</span>
+													<Button
+														variant="icon"
+														iconName="close"
+														ariaLabel="選択した音源を削除"
+														onClick={() => setAudioFile([])}
+													/>
+												</SpaceBetween>
+											</Container>
+										) : null}
+										{values.audio && !audioFile.length ? (
+											<Button
+												loading={isDeletingAudio}
+												disabled={isSubmitting || isDeletingAudio}
+												onClick={handleDeleteAudio}
+											>
+												音源を削除
+											</Button>
+										) : null}
+									</SpaceBetween>
+								</FormField>
 							</Container>
 							<Container header={<Header variant="h2">譜面</Header>}>
 								<SpaceBetween size="l">
@@ -403,6 +514,65 @@ export default function MusicForm({
 																}))
 															}
 														/>
+													</FormField>
+													<FormField label="譜面ファイル">
+														<SpaceBetween size="s">
+															{!chartFiles[key].length && !sheet.chart ? (
+																<FileUpload
+																	accept=".sus"
+																	value={chartFiles[key]}
+																	onChange={({ detail }) =>
+																		setChartFiles((current) => ({
+																			...current,
+																			[key]: detail.value,
+																		}))
+																	}
+																	i18nStrings={{
+																		uploadButtonText: () => "譜面を選択",
+																		dropzoneText: () =>
+																			"SUS ファイルをここにドロップ",
+																		removeFileAriaLabel: () => "譜面を削除",
+																	}}
+																/>
+															) : null}
+															{chartFiles[key][0] ? (
+																<Container>
+																	<SpaceBetween
+																		direction="horizontal"
+																		size="s"
+																		alignItems="center"
+																	>
+																		<span className="break-all">
+																			{chartFiles[key][0].name}
+																		</span>
+																		<Button
+																			variant="icon"
+																			iconName="close"
+																			ariaLabel="選択した譜面を削除"
+																			onClick={() =>
+																				setChartFiles((current) => ({
+																					...current,
+																					[key]: [],
+																				}))
+																			}
+																		/>
+																	</SpaceBetween>
+																</Container>
+															) : null}
+															{sheet.chart &&
+															!chartFiles[key].length &&
+															data ? (
+																<Button
+																	loading={deletingChart === key}
+																	disabled={
+																		isSubmitting || deletingChart === key
+																	}
+																	onClick={() => handleDeleteChart(key)}
+																>
+																	譜面を削除
+																</Button>
+															) : null}
+														</SpaceBetween>
 													</FormField>
 													<FormField
 														label="譜面制作者"

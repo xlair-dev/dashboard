@@ -12,6 +12,7 @@ export type Sheet = {
 	difficulty: "basic" | "advanced" | "master";
 	level: number;
 	notesDesigner: string;
+	src: string | null;
 };
 export type Genre = "ORIGINAL" | "EXTERNAL" | "OTHER";
 export type Music = {
@@ -21,6 +22,7 @@ export type Music = {
 	bpm: number;
 	genre: Genre;
 	jacket: string | null;
+	music: string | null;
 	registrationDate: string;
 	isTest: boolean;
 };
@@ -29,6 +31,31 @@ export type MusicListResponse = {
 	items: MusicWithSheets[];
 	nextCursor: string | null;
 };
+
+function assetUrl(path: string | null): string | null {
+	return path ? new URL(path, process.env.API_BASE_URL).toString() : null;
+}
+
+function normalizeMusic(value: MusicWithSheets): MusicWithSheets {
+	return {
+		music: {
+			...value.music,
+			jacket: assetUrl(value.music.jacket),
+			music: assetUrl(value.music.music),
+		},
+		sheets: value.sheets.map((sheet) => ({
+			...sheet,
+			src: assetUrl(sheet.src),
+		})),
+	};
+}
+
+function normalizeMusicList(value: MusicListResponse): MusicListResponse {
+	return {
+		...value,
+		items: value.items.map(normalizeMusic),
+	};
+}
 export type MusicFields = {
 	title: string;
 	artist: string;
@@ -90,7 +117,7 @@ export async function fetchMusics(
 	);
 	if (!response.ok)
 		throw new Error(`Failed to fetch musics: ${response.status}`);
-	return response.json() as Promise<MusicListResponse>;
+	return normalizeMusicList((await response.json()) as MusicListResponse);
 }
 
 export async function fetchMusic(musicId: string): Promise<MusicWithSheets> {
@@ -104,13 +131,15 @@ export async function fetchMusic(musicId: string): Promise<MusicWithSheets> {
 	);
 	if (!response.ok)
 		throw new Error(`Failed to fetch music: ${response.status}`);
-	return response.json() as Promise<MusicWithSheets>;
+	return normalizeMusic((await response.json()) as MusicWithSheets);
 }
 
 async function writeMusic(
 	path: string,
 	body: CreateMusicInput | UpdateMusicInput,
 	jacket: File | undefined,
+	audio: File | undefined,
+	charts: Array<{ difficulty: Sheet["difficulty"]; file: File }>,
 	returnTo: string,
 ): Promise<MusicWithSheets> {
 	const accessToken = await getAccessToken(returnTo);
@@ -125,9 +154,18 @@ async function writeMusic(
 	});
 	if (!response.ok)
 		throw new Error(`Failed to write music: ${response.status}`);
-	const music = (await response.json()) as MusicWithSheets;
-	if (!jacket) return music;
-	return uploadJacket(music.music.id, jacket, returnTo);
+	const music = normalizeMusic((await response.json()) as MusicWithSheets);
+	let result = music;
+	if (jacket) result = await uploadJacket(result.music.id, jacket, returnTo);
+	if (audio) result = await uploadAudio(result.music.id, audio, returnTo);
+	for (const chart of charts) {
+		const sheet = result.sheets.find(
+			(item) => item.difficulty === chart.difficulty,
+		);
+		if (!sheet) throw new Error(`Sheet not found: ${chart.difficulty}`);
+		result = await uploadChart(sheet.id, chart.file, returnTo);
+	}
+	return result;
 }
 
 async function uploadJacket(
@@ -150,7 +188,55 @@ async function uploadJacket(
 	);
 	if (!response.ok)
 		throw new Error(`Failed to upload jacket: ${response.status}`);
-	return response.json() as Promise<MusicWithSheets>;
+	return normalizeMusic((await response.json()) as MusicWithSheets);
+}
+
+async function uploadAudio(
+	musicId: string,
+	audio: File,
+	returnTo: string,
+): Promise<MusicWithSheets> {
+	const accessToken = await getAccessToken(returnTo);
+	const response = await fetch(
+		`${process.env.API_BASE_URL}/admin/musics/${encodeURIComponent(musicId)}/audio`,
+		{
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${accessToken.token}`,
+				"Content-Type": audio.type,
+			},
+			body: audio,
+			cache: "no-store",
+		},
+	);
+	if (!response.ok)
+		throw new Error(`Failed to upload audio: ${response.status}`);
+	return normalizeMusic((await response.json()) as MusicWithSheets);
+}
+
+async function uploadChart(
+	sheetId: string,
+	chart: File,
+	returnTo: string,
+): Promise<MusicWithSheets> {
+	const accessToken = await getAccessToken(returnTo);
+	const fileName = chart.name.replace(/["\\\r\n]/g, "_");
+	const response = await fetch(
+		`${process.env.API_BASE_URL}/admin/sheets/${encodeURIComponent(sheetId)}/chart`,
+		{
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${accessToken.token}`,
+				"Content-Type": "application/octet-stream",
+				"Content-Disposition": `attachment; filename="${fileName}"`,
+			},
+			body: chart,
+			cache: "no-store",
+		},
+	);
+	if (!response.ok)
+		throw new Error(`Failed to upload chart: ${response.status}`);
+	return normalizeMusic((await response.json()) as MusicWithSheets);
 }
 
 export async function deleteJacket(musicId: string): Promise<MusicWithSheets> {
@@ -165,22 +251,68 @@ export async function deleteJacket(musicId: string): Promise<MusicWithSheets> {
 	);
 	if (!response.ok)
 		throw new Error(`Failed to delete jacket: ${response.status}`);
-	return response.json() as Promise<MusicWithSheets>;
+	return normalizeMusic((await response.json()) as MusicWithSheets);
 }
 
-export function createMusic(input: CreateMusicInput, jacket?: File) {
-	return writeMusic("/admin/musics", input, jacket, "/musics/new");
+export async function deleteAudio(musicId: string): Promise<MusicWithSheets> {
+	const accessToken = await getAccessToken(`/musics/${musicId}/edit`);
+	const response = await fetch(
+		`${process.env.API_BASE_URL}/admin/musics/${encodeURIComponent(musicId)}/audio`,
+		{
+			method: "DELETE",
+			headers: { Authorization: `Bearer ${accessToken.token}` },
+			cache: "no-store",
+		},
+	);
+	if (!response.ok)
+		throw new Error(`Failed to delete audio: ${response.status}`);
+	return normalizeMusic((await response.json()) as MusicWithSheets);
+}
+
+export async function deleteChart(sheetId: string): Promise<MusicWithSheets> {
+	const accessToken = await getAccessToken(`/musics/edit`);
+	const response = await fetch(
+		`${process.env.API_BASE_URL}/admin/sheets/${encodeURIComponent(sheetId)}/chart`,
+		{
+			method: "DELETE",
+			headers: { Authorization: `Bearer ${accessToken.token}` },
+			cache: "no-store",
+		},
+	);
+	if (!response.ok)
+		throw new Error(`Failed to delete chart: ${response.status}`);
+	return normalizeMusic((await response.json()) as MusicWithSheets);
+}
+
+export function createMusic(
+	input: CreateMusicInput,
+	jacket?: File,
+	audio?: File,
+	charts: Array<{ difficulty: Sheet["difficulty"]; file: File }> = [],
+) {
+	return writeMusic(
+		"/admin/musics",
+		input,
+		jacket,
+		audio,
+		charts,
+		"/musics/new",
+	);
 }
 
 export function updateMusic(
 	musicId: string,
 	input: UpdateMusicInput,
 	jacket?: File,
+	audio?: File,
+	charts: Array<{ difficulty: Sheet["difficulty"]; file: File }> = [],
 ) {
 	return writeMusic(
 		`/admin/musics/${encodeURIComponent(musicId)}`,
 		input,
 		jacket,
+		audio,
+		charts,
 		`/musics/${musicId}/edit`,
 	);
 }
