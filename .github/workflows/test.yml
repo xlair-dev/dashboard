@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths:
+      - "renovate.json"
       - ".github/workflows/test.yml"
       - ".github/workflows/**"
       - "Dockerfile"
@@ -17,6 +18,7 @@ on:
       - "pnpm-workspace.yaml"
   pull_request:
     paths:
+      - "renovate.json"
       - ".github/workflows/test.yml"
       - ".github/workflows/**"
       - "Dockerfile"
