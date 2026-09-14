@@ -39,15 +39,15 @@ export function AssetDisplay({
 
 	return (
 		<div className="flex min-h-12 items-center gap-3">
-			<div className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded border border-slate-300">
+			<div className="relative flex size-8 shrink-0 items-center justify-center overflow-hidden rounded border border-slate-300">
 				{type === "jacket" && url ? (
 					<Image
 						src={url}
 						alt="ジャケット"
-						width={32}
-						height={32}
+						fill
+						sizes="32px"
 						loading="eager"
-						className="size-8 object-cover"
+						className="object-cover"
 						unoptimized
 					/>
 				) : (
@@ -108,14 +108,14 @@ export function PendingAssetDisplay({
 		<div className="w-full rounded-[8px] border-2 border-[#006ce0] bg-[#f0fbff] p-2">
 			<div className="flex w-full items-center justify-between gap-3">
 				<div className="flex min-w-0 items-center gap-3">
-					<div className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded border border-slate-300">
+					<div className="relative flex size-8 shrink-0 items-center justify-center overflow-hidden rounded border border-slate-300">
 						{type === "jacket" && previewUrl ? (
 							<Image
 								src={previewUrl}
 								alt="ジャケット"
-								width={32}
-								height={32}
-								className="size-8 object-cover"
+								fill
+								sizes="32px"
+								className="object-cover"
 								unoptimized
 							/>
 						) : (
