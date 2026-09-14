@@ -20,7 +20,7 @@ export default function DashboardLayout({
 	return (
 		<div className="dashboard-layout min-h-screen min-w-80">
 			<TopNavigation
-				className="sticky top-0 z-50"
+				className="sticky top-0 z-[1000]"
 				id="dashboard-header"
 				identity={{ href: "/", title: "XLAIR Dashboard" }}
 			/>
