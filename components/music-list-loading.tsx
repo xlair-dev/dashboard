@@ -8,12 +8,11 @@ import MusicBreadcrumbs from "@/components/music-breadcrumbs";
 
 export default function MusicListLoading() {
 	return (
-		<DashboardLayout
-			activeHref="/musics"
-			breadcrumbs={<MusicBreadcrumbs />}
-			contentHeader={<Header variant="h1">楽曲管理</Header>}
-		>
-			<ContentLayout>
+		<DashboardLayout activeHref="/musics">
+			<ContentLayout
+				breadcrumbs={<MusicBreadcrumbs />}
+				header={<Header variant="h1">楽曲管理</Header>}
+			>
 				<Container>
 					<div
 						aria-label="楽曲一覧を読み込み中"

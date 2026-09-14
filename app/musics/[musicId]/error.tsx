@@ -12,14 +12,13 @@ import MusicBreadcrumbs from "@/components/music-breadcrumbs";
 
 export default function MusicDetailError({ reset }: { reset: () => void }) {
 	return (
-		<DashboardLayout
-			activeHref="/musics"
-			breadcrumbs={
-				<MusicBreadcrumbs current="楽曲詳細" currentHref="/musics" />
-			}
-			contentHeader={<Header variant="h1">楽曲管理</Header>}
-		>
-			<ContentLayout>
+		<DashboardLayout activeHref="/musics">
+			<ContentLayout
+				breadcrumbs={
+					<MusicBreadcrumbs current="楽曲詳細" currentHref="/musics" />
+				}
+				header={<Header variant="h1">楽曲管理</Header>}
+			>
 				<Container>
 					<Alert type="error" header="楽曲を取得できませんでした">
 						楽曲が存在しないか、一時的に取得できません。時間をおいて再試行してください。
