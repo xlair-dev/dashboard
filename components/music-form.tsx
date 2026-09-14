@@ -253,6 +253,11 @@ export default function MusicForm({
 				});
 				saved = await uploadJacketAction(saved.music.id, jacketFile[0]);
 				currentStep += 1;
+				setSaveProgress({
+					current: currentStep,
+					total: totalSteps,
+					label: "ジャケットをアップロードしました",
+				});
 			}
 			if (audioFile[0]) {
 				setSaveProgress({
@@ -262,6 +267,11 @@ export default function MusicForm({
 				});
 				saved = await uploadAudioAction(saved.music.id, audioFile[0]);
 				currentStep += 1;
+				setSaveProgress({
+					current: currentStep,
+					total: totalSteps,
+					label: "音源をアップロードしました",
+				});
 			}
 			for (const { key, label } of difficulties) {
 				const file = chartFiles[key][0];
@@ -275,6 +285,11 @@ export default function MusicForm({
 				});
 				saved = await uploadChartAction(sheet.id, file);
 				currentStep += 1;
+				setSaveProgress({
+					current: currentStep,
+					total: totalSteps,
+					label: `${label} の譜面をアップロードしました`,
+				});
 			}
 			router.push(data ? `/musics/${data.music.id}` : "/musics");
 		} catch (error) {
