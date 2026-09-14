@@ -171,7 +171,7 @@ importers:
         version: 4.29.0(next@16.3.5(@types/node@26.5.1)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@cloudscape-design/components':
         specifier: ^3.0.0
-        version: 3.0.1377(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        version: 3.0.1379(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@cloudscape-design/global-styles':
         specifier: ^1.0.0
         version: 1.0.70
@@ -294,8 +294,8 @@ packages:
     peerDependencies:
       react: '>=16.8.0'
 
-  '@cloudscape-design/components@3.0.1377':
-    resolution: {integrity: sha512-0IXlbkvmAu7DQZM6GY/w0cFqE5JQE/oWn/eE0sc7gJPT+c24J5mUa0YfvHn47JzKfUOys/pN/lghWLRSZe3QyA==}
+  '@cloudscape-design/components@3.0.1379':
+    resolution: {integrity: sha512-CumG1Gj6UboH20J9rcRfKIsVNRTSRJHcPvZgoq55eDI7EnfDqxc59A2t7W5GeI+wbqsGOWaNV1xZkAahlG6teQ==}
     peerDependencies:
       react: '>=16.8.0'
 
@@ -1541,7 +1541,7 @@ snapshots:
       tslib: 2.8.1
       weekstart: 2.0.0
 
-  '@cloudscape-design/components@3.0.1377(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+  '@cloudscape-design/components@3.0.1379(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
       '@cloudscape-design/collection-hooks': 1.0.108(react@19.3.0)
       '@cloudscape-design/component-toolkit': 1.0.0-beta.187(react@19.3.0)
