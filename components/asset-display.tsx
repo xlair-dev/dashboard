@@ -9,8 +9,8 @@ type AssetDisplayProps = {
 	type: AssetType;
 	url: string | null;
 	updatedAt: string | null;
-	fileName?: string;
 	label?: string;
+	showUpdatedAt?: boolean;
 };
 
 const assetLabels: Record<AssetType, string> = {
@@ -29,10 +29,10 @@ export function AssetDisplay({
 	type,
 	url,
 	updatedAt,
-	fileName,
 	label,
+	showUpdatedAt = true,
 }: AssetDisplayProps) {
-	const hasAsset = Boolean(url || fileName);
+	const hasAsset = Boolean(url);
 	const displayLabel = label ?? assetLabels[type];
 
 	return (
@@ -52,17 +52,16 @@ export function AssetDisplay({
 					<Icon
 						name={type === "audio" ? "audio-full" : "file"}
 						variant={hasAsset ? "normal" : "disabled"}
+						className={hasAsset ? "text-cyan-500" : "text-slate-400"}
 						ariaLabel={displayLabel}
 					/>
 				)}
 			</div>
 			<div className="min-w-0">
-				<div className="truncate">
-					{hasAsset ? (fileName ?? displayLabel) : "なし"}
-				</div>
-				{hasAsset && (
+				<div className="truncate">{hasAsset ? displayLabel : "なし"}</div>
+				{hasAsset && showUpdatedAt && (
 					<div className="text-sm text-slate-600">
-						{fileName ? "保存後に反映" : formatUpdatedAt(updatedAt)}
+						{formatUpdatedAt(updatedAt)}
 					</div>
 				)}
 			</div>

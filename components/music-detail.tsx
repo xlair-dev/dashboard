@@ -80,21 +80,28 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 					</Container>
 					<Container header={<Header variant="h2">アセット</Header>}>
 						<SpaceBetween size="l">
-							<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+							<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
 								<AssetDisplay
 									type="jacket"
 									url={music.jacket?.url ?? null}
 									updatedAt={music.jacket?.updatedAt ?? null}
 								/>
-								<AssetDisplay
-									type="audio"
-									url={music.audio?.url ?? null}
-									updatedAt={music.audio?.updatedAt ?? null}
-								/>
-							</div>
-							<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-								{data.sheets.map((sheet) => (
-									<div key={sheet.id}>
+								<div className="md:col-start-3">
+									<AssetDisplay
+										type="audio"
+										url={music.audio?.url ?? null}
+										updatedAt={music.audio?.updatedAt ?? null}
+									/>
+								</div>
+								{data.sheets.map((sheet, index) => (
+									<div
+										key={sheet.id}
+										className={
+											["md:col-start-1", "md:col-start-2", "md:col-start-3"][
+												index
+											] ?? ""
+										}
+									>
 										{chartAssetDisplay(
 											sheet,
 											difficultyLabels[sheet.difficulty],

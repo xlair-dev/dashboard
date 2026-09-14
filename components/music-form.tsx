@@ -300,8 +300,6 @@ export default function MusicForm({
 		}
 	}
 
-	const previewUrl = jacketPreviewUrl ?? values.jacket;
-
 	return (
 		<DashboardLayout activeHref="/musics">
 			<ContentLayout
@@ -401,7 +399,7 @@ export default function MusicForm({
 							<Container header={<Header variant="h2">アセット</Header>}>
 								<FormField label="ジャケット" errorText={assetErrors.jacket}>
 									<SpaceBetween size="s">
-										{!jacketFile.length && !values.jacket ? (
+										{jacketFile.length > 0 || !values.jacket ? (
 											<FileUpload
 												accept="image/jpeg,image/png,image/webp"
 												value={jacketFile}
@@ -427,54 +425,34 @@ export default function MusicForm({
 											/>
 										) : null}
 										{jacketFile[0] ? (
-											<Container>
-												<SpaceBetween
-													direction="horizontal"
-													size="s"
-													alignItems="center"
-												>
-													<span className="break-all">
-														{jacketFile[0].name}
-													</span>
-													<Button
-														variant="icon"
-														iconName="close"
-														ariaLabel="選択した画像を削除"
-														onClick={() => setJacketFile([])}
-													/>
-												</SpaceBetween>
-											</Container>
+											<AssetDisplay
+												type="jacket"
+												url={jacketPreviewUrl ?? null}
+												updatedAt={null}
+												showUpdatedAt={false}
+											/>
 										) : null}
-										<Container>
+										{data && !jacketFile.length && values.jacket ? (
 											<SpaceBetween size="s">
 												<AssetDisplay
 													type="jacket"
-													url={previewUrl ?? null}
+													url={values.jacket}
 													updatedAt={data?.music.jacket?.updatedAt ?? null}
-													fileName={jacketFile[0]?.name}
 												/>
-												{data && !jacketPreviewUrl && values.jacket ? (
-													<Button
-														loading={isDeletingJacket}
-														disabled={isSubmitting || isDeletingJacket}
-														onClick={handleDeleteJacket}
-													>
-														ジャケットを削除
-													</Button>
-												) : null}
+												<Button
+													loading={isDeletingJacket}
+													disabled={isSubmitting || isDeletingJacket}
+													onClick={handleDeleteJacket}
+												>
+													ジャケットを削除
+												</Button>
 											</SpaceBetween>
-										</Container>
+										) : null}
 									</SpaceBetween>
 								</FormField>
 								<FormField label="音源" errorText={assetErrors.audio}>
 									<SpaceBetween size="s">
-										<AssetDisplay
-											type="audio"
-											url={audioFile.length ? null : values.audio}
-											updatedAt={data?.music.audio?.updatedAt ?? null}
-											fileName={audioFile[0]?.name}
-										/>
-										{!audioFile.length && !values.audio ? (
+										{audioFile.length > 0 || !values.audio ? (
 											<FileUpload
 												accept="audio/wav"
 												value={audioFile}
@@ -499,31 +477,21 @@ export default function MusicForm({
 												}}
 											/>
 										) : null}
-										{audioFile[0] ? (
-											<Container>
-												<SpaceBetween
-													direction="horizontal"
-													size="s"
-													alignItems="center"
+										{!audioFile.length && values.audio ? (
+											<SpaceBetween size="s">
+												<AssetDisplay
+													type="audio"
+													url={values.audio}
+													updatedAt={data?.music.audio?.updatedAt ?? null}
+												/>
+												<Button
+													loading={isDeletingAudio}
+													disabled={isSubmitting || isDeletingAudio}
+													onClick={handleDeleteAudio}
 												>
-													<span className="break-all">{audioFile[0].name}</span>
-													<Button
-														variant="icon"
-														iconName="close"
-														ariaLabel="選択した音源を削除"
-														onClick={() => setAudioFile([])}
-													/>
-												</SpaceBetween>
-											</Container>
-										) : null}
-										{values.audio && !audioFile.length ? (
-											<Button
-												loading={isDeletingAudio}
-												disabled={isSubmitting || isDeletingAudio}
-												onClick={handleDeleteAudio}
-											>
-												音源を削除
-											</Button>
+													音源を削除
+												</Button>
+											</SpaceBetween>
 										) : null}
 									</SpaceBetween>
 								</FormField>
@@ -561,20 +529,7 @@ export default function MusicForm({
 														errorText={assetErrors[`chart.${key}`]}
 													>
 														<SpaceBetween size="s">
-															<AssetDisplay
-																type="chart"
-																url={
-																	chartFiles[key].length ? null : sheet.chart
-																}
-																updatedAt={
-																	data?.sheets.find(
-																		(item) => item.difficulty === key,
-																	)?.chart?.updatedAt ?? null
-																}
-																fileName={chartFiles[key][0]?.name}
-																label={label}
-															/>
-															{!chartFiles[key].length && !sheet.chart ? (
+															{chartFiles[key].length > 0 || !sheet.chart ? (
 																<FileUpload
 																	accept=".sus"
 																	value={chartFiles[key]}
@@ -607,42 +562,28 @@ export default function MusicForm({
 																	}}
 																/>
 															) : null}
-															{chartFiles[key][0] ? (
-																<Container>
-																	<SpaceBetween
-																		direction="horizontal"
-																		size="s"
-																		alignItems="center"
+															{!chartFiles[key].length && sheet.chart ? (
+																<SpaceBetween size="s">
+																	<AssetDisplay
+																		type="chart"
+																		url={sheet.chart}
+																		updatedAt={
+																			data?.sheets.find(
+																				(item) => item.difficulty === key,
+																			)?.chart?.updatedAt ?? null
+																		}
+																		label={label}
+																	/>
+																	<Button
+																		loading={deletingChart === key}
+																		disabled={
+																			isSubmitting || deletingChart === key
+																		}
+																		onClick={() => handleDeleteChart(key)}
 																	>
-																		<span className="break-all">
-																			{chartFiles[key][0].name}
-																		</span>
-																		<Button
-																			variant="icon"
-																			iconName="close"
-																			ariaLabel="選択した譜面を削除"
-																			onClick={() =>
-																				setChartFiles((current) => ({
-																					...current,
-																					[key]: [],
-																				}))
-																			}
-																		/>
-																	</SpaceBetween>
-																</Container>
-															) : null}
-															{sheet.chart &&
-															!chartFiles[key].length &&
-															data ? (
-																<Button
-																	loading={deletingChart === key}
-																	disabled={
-																		isSubmitting || deletingChart === key
-																	}
-																	onClick={() => handleDeleteChart(key)}
-																>
-																	譜面を削除
-																</Button>
+																		譜面を削除
+																	</Button>
+																</SpaceBetween>
 															) : null}
 														</SpaceBetween>
 													</FormField>
