@@ -141,6 +141,10 @@ export default function MusicForm({
 		return () => URL.revokeObjectURL(url);
 	}, [jacketFile]);
 
+	useEffect(() => {
+		if (errorNotification) window.scrollTo({ top: 0, behavior: "smooth" });
+	}, [errorNotification]);
+
 	const isEdit = Boolean(data);
 	function setAssetError(field: string, message?: string) {
 		setAssetErrors((current) => {
