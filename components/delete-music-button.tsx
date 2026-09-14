@@ -69,7 +69,10 @@ export default function DeleteMusicButton({ musicId }: { musicId: string }) {
 				iconName="delete-marker"
 				style={destructiveIconStyle}
 				variant="normal"
-				onClick={() => setVisible(true)}
+				onClick={(event) => {
+					event.preventDefault();
+					setVisible(true);
+				}}
 			>
 				楽曲を削除する
 			</Button>
@@ -79,13 +82,22 @@ export default function DeleteMusicButton({ musicId }: { musicId: string }) {
 				header="楽曲を削除"
 				footer={
 					<SpaceBetween direction="horizontal" size="xs">
-						<Button onClick={() => setVisible(false)} disabled={isPending}>
+						<Button
+							onClick={(event) => {
+								event.preventDefault();
+								setVisible(false);
+							}}
+							disabled={isPending}
+						>
 							キャンセル
 						</Button>
 						<Button
 							style={destructiveActionStyle}
 							variant="primary"
-							onClick={handleDelete}
+							onClick={(event) => {
+								event.preventDefault();
+								handleDelete();
+							}}
 							loading={isPending}
 						>
 							削除
