@@ -1,5 +1,4 @@
 import Button from "@cloudscape-design/components/button";
-import Container from "@cloudscape-design/components/container";
 import Icon from "@cloudscape-design/components/icon";
 import SpaceBetween from "@cloudscape-design/components/space-between";
 import Image from "next/image";
@@ -86,23 +85,38 @@ export function chartAssetDisplay(sheet: Sheet, label?: string) {
 export function PendingAssetDisplay({
 	type,
 	fileName,
+	previewUrl,
 	onRemove,
 }: {
 	type: AssetType;
 	fileName: string;
+	previewUrl?: string;
 	onRemove: () => void;
 }) {
 	const label = assetLabels[type];
 
 	return (
-		<Container>
+		<div className="rounded border border-blue-500 p-4">
 			<SpaceBetween direction="horizontal" size="s" alignItems="center">
 				<SpaceBetween direction="horizontal" size="s" alignItems="center">
-					<Icon
-						name={type === "audio" ? "audio-full" : "file"}
-						className="text-cyan-500"
-						ariaLabel={label}
-					/>
+					<div className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded border border-slate-300">
+						{type === "jacket" && previewUrl ? (
+							<Image
+								src={previewUrl}
+								alt="ジャケット"
+								width={32}
+								height={32}
+								className="size-8 object-cover"
+								unoptimized
+							/>
+						) : (
+							<Icon
+								name={type === "audio" ? "audio-full" : "file"}
+								className="text-cyan-500"
+								ariaLabel={label}
+							/>
+						)}
+					</div>
 					<span className="break-all">{fileName}</span>
 				</SpaceBetween>
 				<Button
@@ -112,6 +126,6 @@ export function PendingAssetDisplay({
 					onClick={onRemove}
 				/>
 			</SpaceBetween>
-		</Container>
+		</div>
 	);
 }

@@ -399,7 +399,7 @@ export default function MusicForm({
 							<Container header={<Header variant="h2">アセット</Header>}>
 								<FormField label="ジャケット" errorText={assetErrors.jacket}>
 									<SpaceBetween size="s">
-										{jacketFile.length > 0 || !values.jacket ? (
+										{!jacketFile.length && !values.jacket ? (
 											<FileUpload
 												accept="image/jpeg,image/png,image/webp"
 												value={jacketFile}
@@ -429,13 +429,8 @@ export default function MusicForm({
 												<PendingAssetDisplay
 													type="jacket"
 													fileName={jacketFile[0].name}
+													previewUrl={jacketPreviewUrl}
 													onRemove={() => setJacketFile([])}
-												/>
-												<AssetDisplay
-													type="jacket"
-													url={jacketPreviewUrl ?? null}
-													updatedAt={null}
-													showUpdatedAt={false}
 												/>
 											</SpaceBetween>
 										) : null}
@@ -459,7 +454,7 @@ export default function MusicForm({
 								</FormField>
 								<FormField label="音源" errorText={assetErrors.audio}>
 									<SpaceBetween size="s">
-										{audioFile.length > 0 || !values.audio ? (
+										{!audioFile.length && !values.audio ? (
 											<FileUpload
 												accept="audio/wav"
 												value={audioFile}
@@ -543,7 +538,7 @@ export default function MusicForm({
 														errorText={assetErrors[`chart.${key}`]}
 													>
 														<SpaceBetween size="s">
-															{chartFiles[key].length > 0 || !sheet.chart ? (
+															{!chartFiles[key].length && !sheet.chart ? (
 																<FileUpload
 																	accept=".sus"
 																	value={chartFiles[key]}
