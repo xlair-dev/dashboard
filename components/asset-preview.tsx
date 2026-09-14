@@ -12,6 +12,33 @@ function proxyUrl(url: string) {
 	return `/api/assets${path}`;
 }
 
+function chartDocument(svg: string) {
+	return `<!doctype html>
+<html lang="ja">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+html, body { margin: 0; min-height: 100%; background: white; }
+body { overflow: auto; }
+#chart { transform-origin: top left; width: max-content; min-width: 100%; }
+#chart svg { display: block; width: auto; min-width: 100%; height: auto; }
+</style>
+</head>
+<body>
+<div id="chart">${svg}</div>
+<script>
+const chart = document.getElementById("chart");
+let scale = 1;
+document.addEventListener("wheel", (event) => {
+  event.preventDefault();
+  scale = Math.min(4, Math.max(0.25, scale * Math.pow(1.0015, -event.deltaY)));
+  chart.style.transform = "scale(" + scale + ")";
+}, { passive: false });
+</script>
+</body>
+</html>`;
+}
+
 export default function AssetPreview({
 	type,
 	url,
@@ -97,8 +124,8 @@ export default function AssetPreview({
 					{type === "chart" && svg ? (
 						<iframe
 							title="譜面プレビュー"
-							sandbox=""
-							srcDoc={svg}
+							sandbox="allow-scripts"
+							srcDoc={chartDocument(svg)}
 							className="h-[32rem] w-full border-0"
 						/>
 					) : null}
