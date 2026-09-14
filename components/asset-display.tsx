@@ -96,7 +96,7 @@ export function PendingAssetDisplay({
 	const label = assetLabels[type];
 
 	return (
-		<div className="rounded-lg border-2 border-[var(--color-border-item-selected)] bg-[var(--color-background-item-selected)] p-4">
+		<div className="rounded-[8px] border-2 border-[#006ce0] bg-[#f0fbff] p-4">
 			<SpaceBetween direction="horizontal" size="s" alignItems="center">
 				<SpaceBetween direction="horizontal" size="s" alignItems="center">
 					<div className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded border border-slate-300">
