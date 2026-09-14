@@ -9,6 +9,7 @@ import SpaceBetween from "@cloudscape-design/components/space-between";
 
 import DashboardLayout from "@/components/dashboard-layout";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
+import StickyPageHeader from "@/components/sticky-page-header";
 
 export default function MusicDetailError({ reset }: { reset: () => void }) {
 	return (
@@ -17,7 +18,11 @@ export default function MusicDetailError({ reset }: { reset: () => void }) {
 				breadcrumbs={
 					<MusicBreadcrumbs current="楽曲詳細" currentHref="/musics" />
 				}
-				header={<Header variant="h1">楽曲管理</Header>}
+				header={
+					<StickyPageHeader>
+						<Header variant="h1">楽曲管理</Header>
+					</StickyPageHeader>
+				}
 			>
 				<Container>
 					<Alert type="error" header="楽曲を取得できませんでした">
