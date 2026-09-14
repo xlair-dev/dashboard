@@ -13,6 +13,7 @@ export type Sheet = {
 	level: number;
 	notesDesigner: string;
 	src: string | null;
+	chartUpdatedAt: string | null;
 };
 export type Genre = "ORIGINAL" | "EXTERNAL" | "OTHER";
 export type Music = {
@@ -22,7 +23,9 @@ export type Music = {
 	bpm: number;
 	genre: Genre;
 	jacket: string | null;
+	jacketUpdatedAt: string | null;
 	music: string | null;
+	musicUpdatedAt: string | null;
 	registrationDate: string;
 	isTest: boolean;
 };

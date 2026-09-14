@@ -13,7 +13,6 @@ import Header from "@cloudscape-design/components/header";
 import Input from "@cloudscape-design/components/input";
 import Select from "@cloudscape-design/components/select";
 import SpaceBetween from "@cloudscape-design/components/space-between";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -24,6 +23,7 @@ import {
 	deleteJacketAction,
 	updateMusicAction,
 } from "@/app/musics/actions";
+import { AssetDisplay } from "@/components/asset-display";
 import DashboardLayout from "@/components/dashboard-layout";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
 import type {
@@ -445,34 +445,35 @@ export default function MusicForm({
 												</SpaceBetween>
 											</Container>
 										) : null}
-										{previewUrl ? (
-											<Container>
-												<SpaceBetween size="s">
-													<Image
-														src={previewUrl}
-														alt="ジャケットプレビュー"
-														width={128}
-														height={128}
-														loading="eager"
-														className="size-32 object-cover"
-														unoptimized
-													/>
-													{data && !jacketPreviewUrl ? (
-														<Button
-															loading={isDeletingJacket}
-															disabled={isSubmitting || isDeletingJacket}
-															onClick={handleDeleteJacket}
-														>
-															ジャケットを削除
-														</Button>
-													) : null}
-												</SpaceBetween>
-											</Container>
-										) : null}
+										<Container>
+											<SpaceBetween size="s">
+												<AssetDisplay
+													type="jacket"
+													url={previewUrl ?? null}
+													updatedAt={data?.music.jacketUpdatedAt ?? null}
+													fileName={jacketFile[0]?.name}
+												/>
+												{data && !jacketPreviewUrl && values.jacket ? (
+													<Button
+														loading={isDeletingJacket}
+														disabled={isSubmitting || isDeletingJacket}
+														onClick={handleDeleteJacket}
+													>
+														ジャケットを削除
+													</Button>
+												) : null}
+											</SpaceBetween>
+										</Container>
 									</SpaceBetween>
 								</FormField>
 								<FormField label="音源" errorText={assetErrors.audio}>
 									<SpaceBetween size="s">
+										<AssetDisplay
+											type="audio"
+											url={audioFile.length ? null : values.audio}
+											updatedAt={data?.music.musicUpdatedAt ?? null}
+											fileName={audioFile[0]?.name}
+										/>
 										{!audioFile.length && !values.audio ? (
 											<FileUpload
 												accept="audio/wav"
@@ -560,6 +561,19 @@ export default function MusicForm({
 														errorText={assetErrors[`chart.${key}`]}
 													>
 														<SpaceBetween size="s">
+															<AssetDisplay
+																type="chart"
+																url={
+																	chartFiles[key].length ? null : sheet.chart
+																}
+																updatedAt={
+																	data?.sheets.find(
+																		(item) => item.difficulty === key,
+																	)?.chartUpdatedAt ?? null
+																}
+																fileName={chartFiles[key][0]?.name}
+																label={label}
+															/>
 															{!chartFiles[key].length && !sheet.chart ? (
 																<FileUpload
 																	accept=".sus"
