@@ -12,9 +12,13 @@ const navigationItems = [
 
 export default function DashboardLayout({
 	activeHref,
+	breadcrumbs,
+	contentHeader,
 	children,
 }: {
 	activeHref: string;
+	breadcrumbs?: ReactNode;
+	contentHeader?: ReactNode;
 	children: ReactNode;
 }) {
 	return (
@@ -32,6 +36,8 @@ export default function DashboardLayout({
 						items={navigationItems}
 					/>
 				}
+				breadcrumbs={breadcrumbs}
+				contentHeader={contentHeader}
 				// Remove toolsHide when an AppLayout tools panel is introduced.
 				toolsHide
 				content={children}

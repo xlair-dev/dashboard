@@ -8,7 +8,6 @@ import dynamic from "next/dynamic";
 
 import DashboardLayout from "@/components/dashboard-layout";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
-import StickyPageHeader from "@/components/sticky-page-header";
 import type { MusicListResponse } from "@/lib/api";
 
 const MusicTable = dynamic(() => import("@/components/music-table"), {
@@ -30,24 +29,23 @@ export default function MusicList({
 		: undefined;
 
 	return (
-		<DashboardLayout activeHref="/musics">
-			<ContentLayout
-				breadcrumbs={<MusicBreadcrumbs />}
-				header={
-					<StickyPageHeader>
-						<Header
-							variant="h1"
-							actions={
-								<Button variant="primary" href="/musics/new">
-									楽曲を追加
-								</Button>
-							}
-						>
-							楽曲管理
-						</Header>
-					</StickyPageHeader>
-				}
-			>
+		<DashboardLayout
+			activeHref="/musics"
+			breadcrumbs={<MusicBreadcrumbs />}
+			contentHeader={
+				<Header
+					variant="h1"
+					actions={
+						<Button variant="primary" href="/musics/new">
+							楽曲を追加
+						</Button>
+					}
+				>
+					楽曲管理
+				</Header>
+			}
+		>
+			<ContentLayout>
 				<SpaceBetween size="m">
 					<MusicTable data={data} />
 					{nextPageHref ? (

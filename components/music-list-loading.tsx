@@ -5,19 +5,15 @@ import Spinner from "@cloudscape-design/components/spinner";
 
 import DashboardLayout from "@/components/dashboard-layout";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
-import StickyPageHeader from "@/components/sticky-page-header";
 
 export default function MusicListLoading() {
 	return (
-		<DashboardLayout activeHref="/musics">
-			<ContentLayout
-				breadcrumbs={<MusicBreadcrumbs />}
-				header={
-					<StickyPageHeader>
-						<Header variant="h1">楽曲管理</Header>
-					</StickyPageHeader>
-				}
-			>
+		<DashboardLayout
+			activeHref="/musics"
+			breadcrumbs={<MusicBreadcrumbs />}
+			contentHeader={<Header variant="h1">楽曲管理</Header>}
+		>
+			<ContentLayout>
 				<Container>
 					<div
 						aria-label="楽曲一覧を読み込み中"

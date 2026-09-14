@@ -11,7 +11,6 @@ import type { ReactNode } from "react";
 import { AssetDisplay, chartAssetDisplay } from "@/components/asset-display";
 import DashboardLayout from "@/components/dashboard-layout";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
-import StickyPageHeader from "@/components/sticky-page-header";
 import type { MusicWithSheets } from "@/lib/api";
 
 const MusicSheetsTable = dynamic(
@@ -37,25 +36,24 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 	const { music } = data;
 
 	return (
-		<DashboardLayout activeHref="/musics">
-			<ContentLayout
-				header={
-					<StickyPageHeader>
-						<Header
-							variant="h1"
-							actions={<Button href={`/musics/${music.id}/edit`}>編集</Button>}
-						>
-							{music.title}
-						</Header>
-					</StickyPageHeader>
-				}
-				breadcrumbs={
-					<MusicBreadcrumbs
-						current={music.title}
-						currentHref={`/musics/${encodeURIComponent(music.id)}`}
-					/>
-				}
-			>
+		<DashboardLayout
+			activeHref="/musics"
+			breadcrumbs={
+				<MusicBreadcrumbs
+					current={music.title}
+					currentHref={`/musics/${encodeURIComponent(music.id)}`}
+				/>
+			}
+			contentHeader={
+				<Header
+					variant="h1"
+					actions={<Button href={`/musics/${music.id}/edit`}>編集</Button>}
+				>
+					{music.title}
+				</Header>
+			}
+		>
+			<ContentLayout>
 				<SpaceBetween size="l">
 					<Container header={<Header variant="h2">楽曲情報</Header>}>
 						<dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
