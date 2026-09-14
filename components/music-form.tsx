@@ -701,17 +701,17 @@ export default function MusicForm({
 								</SpaceBetween>
 							</Container>
 						</SpaceBetween>
+						{saveProgress ? (
+							<div className="mt-4">
+								<ProgressBar
+									value={(saveProgress.current / saveProgress.total) * 100}
+									label={saveProgress.label}
+									description={`${saveProgress.current} / ${saveProgress.total}`}
+								/>
+							</div>
+						) : null}
 					</Form>
 				</form>
-				{saveProgress ? (
-					<div className="mt-4">
-						<ProgressBar
-							value={(saveProgress.current / saveProgress.total) * 100}
-							label={saveProgress.label}
-							description={`${saveProgress.current} / ${saveProgress.total}`}
-						/>
-					</div>
-				) : null}
 			</ContentLayout>
 		</DashboardLayout>
 	);
