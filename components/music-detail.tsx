@@ -11,6 +11,7 @@ import type { ReactNode } from "react";
 import { AssetDisplay, chartAssetDisplay } from "@/components/asset-display";
 import DashboardLayout from "@/components/dashboard-layout";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
+import StickyPageHeader from "@/components/sticky-page-header";
 import type { MusicWithSheets } from "@/lib/api";
 
 const MusicSheetsTable = dynamic(
@@ -39,12 +40,14 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 		<DashboardLayout activeHref="/musics">
 			<ContentLayout
 				header={
-					<Header
-						variant="h1"
-						actions={<Button href={`/musics/${music.id}/edit`}>編集</Button>}
-					>
-						{music.title}
-					</Header>
+					<StickyPageHeader>
+						<Header
+							variant="h1"
+							actions={<Button href={`/musics/${music.id}/edit`}>編集</Button>}
+						>
+							{music.title}
+						</Header>
+					</StickyPageHeader>
 				}
 				breadcrumbs={
 					<MusicBreadcrumbs

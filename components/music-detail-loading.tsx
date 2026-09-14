@@ -5,6 +5,7 @@ import Spinner from "@cloudscape-design/components/spinner";
 
 import DashboardLayout from "@/components/dashboard-layout";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
+import StickyPageHeader from "@/components/sticky-page-header";
 
 export default function MusicDetailLoading() {
 	return (
@@ -13,7 +14,11 @@ export default function MusicDetailLoading() {
 				breadcrumbs={
 					<MusicBreadcrumbs current="楽曲詳細" currentHref="/musics" />
 				}
-				header={<Header variant="h1">楽曲管理</Header>}
+				header={
+					<StickyPageHeader>
+						<Header variant="h1">楽曲管理</Header>
+					</StickyPageHeader>
+				}
 			>
 				<Container>
 					<div

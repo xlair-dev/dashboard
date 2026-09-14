@@ -30,6 +30,7 @@ import {
 import { AssetDisplay, PendingAssetDisplay } from "@/components/asset-display";
 import DashboardLayout from "@/components/dashboard-layout";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
+import StickyPageHeader from "@/components/sticky-page-header";
 import type {
 	CreateMusicInput,
 	Genre,
@@ -374,7 +375,11 @@ export default function MusicForm({
 						currentHref={data ? `/musics/${data.music.id}/edit` : "/musics/new"}
 					/>
 				}
-				header={<Header variant="h1">{title}</Header>}
+				header={
+					<StickyPageHeader>
+						<Header variant="h1">{title}</Header>
+					</StickyPageHeader>
+				}
 			>
 				<form onSubmit={handleSubmit}>
 					<Form
