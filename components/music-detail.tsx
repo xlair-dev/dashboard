@@ -26,6 +26,12 @@ const difficultyLabels = {
 	master: "Master",
 } as const;
 
+const difficultyColumns = {
+	basic: "md:col-start-1",
+	advanced: "md:col-start-2",
+	master: "md:col-start-3",
+} as const;
+
 export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 	const { music } = data;
 
@@ -80,21 +86,24 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 					</Container>
 					<Container header={<Header variant="h2">アセット</Header>}>
 						<SpaceBetween size="l">
-							<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+							<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
 								<AssetDisplay
 									type="jacket"
 									url={music.jacket?.url ?? null}
 									updatedAt={music.jacket?.updatedAt ?? null}
 								/>
-								<AssetDisplay
-									type="audio"
-									url={music.audio?.url ?? null}
-									updatedAt={music.audio?.updatedAt ?? null}
-								/>
-							</div>
-							<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+								<div className="md:col-start-2">
+									<AssetDisplay
+										type="audio"
+										url={music.audio?.url ?? null}
+										updatedAt={music.audio?.updatedAt ?? null}
+									/>
+								</div>
 								{data.sheets.map((sheet) => (
-									<div key={sheet.id}>
+									<div
+										key={sheet.id}
+										className={difficultyColumns[sheet.difficulty]}
+									>
 										{chartAssetDisplay(
 											sheet,
 											difficultyLabels[sheet.difficulty],

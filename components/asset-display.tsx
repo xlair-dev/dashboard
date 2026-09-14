@@ -1,3 +1,4 @@
+import Button from "@cloudscape-design/components/button";
 import Icon from "@cloudscape-design/components/icon";
 import Image from "next/image";
 
@@ -9,7 +10,6 @@ type AssetDisplayProps = {
 	type: AssetType;
 	url: string | null;
 	updatedAt: string | null;
-	fileName?: string;
 	label?: string;
 };
 
@@ -29,10 +29,9 @@ export function AssetDisplay({
 	type,
 	url,
 	updatedAt,
-	fileName,
 	label,
 }: AssetDisplayProps) {
-	const hasAsset = Boolean(url || fileName);
+	const hasAsset = Boolean(url);
 	const displayLabel = label ?? assetLabels[type];
 
 	return (
@@ -51,20 +50,17 @@ export function AssetDisplay({
 				) : (
 					<Icon
 						name={type === "audio" ? "audio-full" : "file"}
-						variant={hasAsset ? "normal" : "disabled"}
+						variant="normal"
+						className={hasAsset ? undefined : "!text-slate-300"}
 						ariaLabel={displayLabel}
 					/>
 				)}
 			</div>
 			<div className="min-w-0">
-				<div className="truncate">
-					{hasAsset ? (fileName ?? displayLabel) : "なし"}
+				<div className="truncate">{displayLabel}</div>
+				<div className="text-sm text-slate-600">
+					{hasAsset ? formatUpdatedAt(updatedAt) : "なし"}
 				</div>
-				{hasAsset && (
-					<div className="text-sm text-slate-600">
-						{fileName ? "保存後に反映" : formatUpdatedAt(updatedAt)}
-					</div>
-				)}
 			</div>
 		</div>
 	);
@@ -78,5 +74,52 @@ export function chartAssetDisplay(sheet: Sheet, label?: string) {
 			updatedAt={sheet.chart?.updatedAt ?? null}
 			label={label}
 		/>
+	);
+}
+
+export function PendingAssetDisplay({
+	type,
+	fileName,
+	previewUrl,
+	onRemove,
+}: {
+	type: AssetType;
+	fileName: string;
+	previewUrl?: string;
+	onRemove: () => void;
+}) {
+	const label = assetLabels[type];
+
+	return (
+		<div className="w-full rounded-[8px] border-2 border-[#006ce0] bg-[#f0fbff] p-2">
+			<div className="flex w-full items-center justify-between gap-3">
+				<div className="flex min-w-0 items-center gap-3">
+					<div className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded border border-slate-300">
+						{type === "jacket" && previewUrl ? (
+							<Image
+								src={previewUrl}
+								alt="ジャケット"
+								width={32}
+								height={32}
+								className="size-8 object-cover"
+								unoptimized
+							/>
+						) : (
+							<Icon
+								name={type === "audio" ? "audio-full" : "file"}
+								ariaLabel={label}
+							/>
+						)}
+					</div>
+					<span className="min-w-0 break-all">{fileName}</span>
+				</div>
+				<Button
+					variant="icon"
+					iconName="close"
+					ariaLabel={`${label}を選択解除`}
+					onClick={onRemove}
+				/>
+			</div>
+		</div>
 	);
 }
