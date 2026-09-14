@@ -18,8 +18,9 @@ export default function DashboardLayout({
 	children: ReactNode;
 }) {
 	return (
-		<div className="min-h-screen min-w-80">
+		<div className="dashboard-layout min-h-screen min-w-80">
 			<TopNavigation
+				className="sticky top-0 z-[1000]"
 				id="dashboard-header"
 				identity={{ href: "/", title: "XLAIR Dashboard" }}
 			/>
