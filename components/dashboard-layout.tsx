@@ -28,6 +28,7 @@ export default function DashboardLayout({
 				identity={{ href: "/", title: "XLAIR Dashboard" }}
 			/>
 			<AppLayout
+				disableBodyScroll
 				headerSelector="#dashboard-header"
 				navigation={
 					<SideNavigation
