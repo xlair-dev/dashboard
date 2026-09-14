@@ -29,18 +29,23 @@ export default function MusicList({
 		: undefined;
 
 	return (
-		<DashboardLayout
-			activeHref="/musics"
-			breadcrumbs={<MusicBreadcrumbs />}
-			contentHeader={<Header variant="h1">楽曲管理</Header>}
-		>
-			<ContentLayout>
+		<DashboardLayout activeHref="/musics">
+			<ContentLayout
+				breadcrumbs={<MusicBreadcrumbs />}
+				header={
+					<Header
+						variant="h1"
+						actions={
+							<Button variant="primary" href="/musics/new">
+								楽曲を追加
+							</Button>
+						}
+					>
+						楽曲管理
+					</Header>
+				}
+			>
 				<SpaceBetween size="m">
-					<div className="flex justify-end">
-						<Button variant="primary" href="/musics/new">
-							楽曲を追加
-						</Button>
-					</div>
 					<MusicTable data={data} />
 					{nextPageHref ? (
 						<div className="flex justify-end">

@@ -8,11 +8,8 @@ import DashboardLayout from "@/components/dashboard-layout";
 
 export default function DashboardHome({ userName }: { userName: string }) {
 	return (
-		<DashboardLayout
-			activeHref="/"
-			contentHeader={<Header variant="h1">XLAIR Dashboard</Header>}
-		>
-			<ContentLayout>
+		<DashboardLayout activeHref="/">
+			<ContentLayout header={<Header variant="h1">XLAIR Dashboard</Header>}>
 				<Container>
 					<SpaceBetween size="m">
 						<div>管理者用ダッシュボードへようこそ、{userName} さん。</div>

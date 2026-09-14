@@ -349,34 +349,33 @@ export default function MusicForm({
 	}
 
 	return (
-		<DashboardLayout
-			activeHref="/musics"
-			breadcrumbs={
-				<MusicBreadcrumbs
-					current={title}
-					currentHref={data ? `/musics/${data.music.id}/edit` : "/musics/new"}
-				/>
-			}
-			contentHeader={<Header variant="h1">{title}</Header>}
-		>
-			{errorNotification ? (
-				<div className="fixed inset-x-4 top-16 z-50 sm:left-auto sm:w-96">
-					<Flashbar
-						items={[
-							{
-								id: "music-form-error",
-								type: "error",
-								header: "エラーが発生しました",
-								content: errorNotification,
-								dismissible: true,
-								dismissLabel: "エラー通知を閉じる",
-								onDismiss: () => setErrorNotification(undefined),
-							},
-						]}
+		<DashboardLayout activeHref="/musics">
+			<ContentLayout
+				breadcrumbs={
+					<MusicBreadcrumbs
+						current={title}
+						currentHref={data ? `/musics/${data.music.id}/edit` : "/musics/new"}
 					/>
-				</div>
-			) : null}
-			<ContentLayout>
+				}
+				header={<Header variant="h1">{title}</Header>}
+			>
+				{errorNotification ? (
+					<div className="fixed inset-x-4 top-16 z-50 sm:left-auto sm:w-96">
+						<Flashbar
+							items={[
+								{
+									id: "music-form-error",
+									type: "error",
+									header: "エラーが発生しました",
+									content: errorNotification,
+									dismissible: true,
+									dismissLabel: "エラー通知を閉じる",
+									onDismiss: () => setErrorNotification(undefined),
+								},
+							]}
+						/>
+					</div>
+				) : null}
 				<form onSubmit={handleSubmit}>
 					<Form
 						actions={

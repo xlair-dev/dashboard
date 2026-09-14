@@ -12,13 +12,9 @@ const navigationItems = [
 
 export default function DashboardLayout({
 	activeHref,
-	breadcrumbs,
-	contentHeader,
 	children,
 }: {
 	activeHref: string;
-	breadcrumbs?: ReactNode;
-	contentHeader?: ReactNode;
 	children: ReactNode;
 }) {
 	return (
@@ -28,7 +24,6 @@ export default function DashboardLayout({
 				identity={{ href: "/", title: "XLAIR Dashboard" }}
 			/>
 			<AppLayout
-				disableBodyScroll
 				headerSelector="#dashboard-header"
 				navigation={
 					<SideNavigation
@@ -36,12 +31,6 @@ export default function DashboardLayout({
 						header={{ href: "/", text: "XLAIR Dashboard" }}
 						items={navigationItems}
 					/>
-				}
-				breadcrumbs={breadcrumbs}
-				contentHeader={
-					contentHeader ? (
-						<div className="dashboard-content-header">{contentHeader}</div>
-					) : undefined
 				}
 				// Remove toolsHide when an AppLayout tools panel is introduced.
 				toolsHide
