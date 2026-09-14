@@ -28,7 +28,6 @@ import {
 	uploadJacketAction,
 } from "@/app/musics/actions";
 import { AssetDisplay, PendingAssetDisplay } from "@/components/asset-display";
-import AssetPreview from "@/components/asset-preview";
 import DashboardLayout from "@/components/dashboard-layout";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
 import type {
@@ -553,14 +552,9 @@ export default function MusicForm({
 											<PendingAssetDisplay
 												type="audio"
 												fileName={audioFile[0].name}
-												onRemove={() => setAudioFile([])}
-											/>
-										) : null}
-										{audioFile[0] ? (
-											<AssetPreview
-												type="audio"
 												file={audioFile[0]}
-												label="音源"
+												previewType="audio"
+												onRemove={() => setAudioFile([])}
 											/>
 										) : null}
 										{!audioFile.length && values.audio ? (
@@ -650,16 +644,11 @@ export default function MusicForm({
 																/>
 															) : null}
 															{chartFiles[key][0] ? (
-																<AssetPreview
-																	type="chart"
-																	file={chartFiles[key][0]}
-																	label={`${label} 譜面`}
-																/>
-															) : null}
-															{chartFiles[key][0] ? (
 																<PendingAssetDisplay
 																	type="chart"
 																	fileName={chartFiles[key][0].name}
+																	file={chartFiles[key][0]}
+																	previewType="chart"
 																	onRemove={() =>
 																		setChartFiles((current) => ({
 																			...current,

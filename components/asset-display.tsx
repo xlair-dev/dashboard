@@ -91,11 +91,15 @@ export function PendingAssetDisplay({
 	type,
 	fileName,
 	previewUrl,
+	file,
+	previewType,
 	onRemove,
 }: {
 	type: AssetType;
 	fileName: string;
 	previewUrl?: string;
+	file?: File;
+	previewType?: "audio" | "chart";
 	onRemove: () => void;
 }) {
 	const label = assetLabels[type];
@@ -121,7 +125,11 @@ export function PendingAssetDisplay({
 							/>
 						)}
 					</div>
-					<span className="min-w-0 break-all">{fileName}</span>
+					{file && previewType ? (
+						<AssetPreview type={previewType} file={file} label={fileName} />
+					) : (
+						<span className="min-w-0 break-all">{fileName}</span>
+					)}
 				</div>
 				<Button
 					variant="icon"
