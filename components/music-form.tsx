@@ -1,12 +1,12 @@
 "use client";
 
-import Alert from "@cloudscape-design/components/alert";
 import Button from "@cloudscape-design/components/button";
 import Checkbox from "@cloudscape-design/components/checkbox";
 import Container from "@cloudscape-design/components/container";
 import ContentLayout from "@cloudscape-design/components/content-layout";
 import DatePicker from "@cloudscape-design/components/date-picker";
 import FileUpload from "@cloudscape-design/components/file-upload";
+import Flashbar from "@cloudscape-design/components/flashbar";
 import Form from "@cloudscape-design/components/form";
 import FormField from "@cloudscape-design/components/form-field";
 import Header from "@cloudscape-design/components/header";
@@ -109,7 +109,7 @@ export default function MusicForm({
 }) {
 	const [values, setValues] = useState(() => initialValues(data));
 	const [errors, setErrors] = useState<Record<string, string>>({});
-	const [submitError, setSubmitError] = useState<string>();
+	const [errorNotification, setErrorNotification] = useState<string>();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isDeletingJacket, setIsDeletingJacket] = useState(false);
 	const [isDeletingAudio, setIsDeletingAudio] = useState(false);
@@ -124,6 +124,10 @@ export default function MusicForm({
 	const [assetErrors, setAssetErrors] = useState<Record<string, string>>({});
 	const [jacketPreviewUrl, setJacketPreviewUrl] = useState<string>();
 	const router = useRouter();
+
+	function showError(error: unknown, fallback: string) {
+		setErrorNotification(error instanceof Error ? error.message : fallback);
+	}
 
 	useEffect(() => {
 		const file = jacketFile[0];
@@ -181,7 +185,7 @@ export default function MusicForm({
 
 	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
-		setSubmitError(undefined);
+		setErrorNotification(undefined);
 		if (Object.keys(validate()).length > 0) return;
 		setIsSubmitting(true);
 		try {
@@ -234,9 +238,7 @@ export default function MusicForm({
 			}
 			router.push(data ? `/musics/${data.music.id}` : "/musics");
 		} catch (error) {
-			setSubmitError(
-				error instanceof Error ? error.message : "保存に失敗しました。",
-			);
+			showError(error, "保存に失敗しました。");
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -244,18 +246,14 @@ export default function MusicForm({
 
 	async function handleDeleteJacket() {
 		if (!data) return;
-		setSubmitError(undefined);
+		setErrorNotification(undefined);
 		setIsDeletingJacket(true);
 		try {
 			await deleteJacketAction(data.music.id);
 			setValues((current) => ({ ...current, jacket: null }));
 			setJacketFile([]);
 		} catch (error) {
-			setSubmitError(
-				error instanceof Error
-					? error.message
-					: "ジャケットを削除できませんでした。",
-			);
+			showError(error, "ジャケットを削除できませんでした。");
 		} finally {
 			setIsDeletingJacket(false);
 		}
@@ -268,9 +266,7 @@ export default function MusicForm({
 			await deleteAudioAction(data.music.id);
 			setValues((current) => ({ ...current, audio: null }));
 		} catch (error) {
-			setSubmitError(
-				error instanceof Error ? error.message : "音源を削除できませんでした。",
-			);
+			showError(error, "音源を削除できませんでした。");
 		} finally {
 			setIsDeletingAudio(false);
 		}
@@ -290,11 +286,7 @@ export default function MusicForm({
 				},
 			}));
 		} catch (error) {
-			setSubmitError(
-				error instanceof Error
-					? error.message
-					: "譜面ファイルを削除できませんでした。",
-			);
+			showError(error, "譜面ファイルを削除できませんでした。");
 		} finally {
 			setDeletingChart(undefined);
 		}
@@ -302,6 +294,23 @@ export default function MusicForm({
 
 	return (
 		<DashboardLayout activeHref="/musics">
+			{errorNotification ? (
+				<div className="fixed inset-x-4 top-16 z-50 sm:left-auto sm:w-96">
+					<Flashbar
+						items={[
+							{
+								id: "music-form-error",
+								type: "error",
+								header: "エラーが発生しました",
+								content: errorNotification,
+								dismissible: true,
+								dismissLabel: "エラー通知を閉じる",
+								onDismiss: () => setErrorNotification(undefined),
+							},
+						]}
+					/>
+				</div>
+			) : null}
 			<ContentLayout
 				breadcrumbs={
 					<MusicBreadcrumbs
@@ -329,11 +338,6 @@ export default function MusicForm({
 						}
 					>
 						<SpaceBetween size="l">
-							{submitError ? (
-								<Alert type="error" header="保存できませんでした">
-									{submitError}
-								</Alert>
-							) : null}
 							<Container header={<Header variant="h2">楽曲情報</Header>}>
 								<SpaceBetween size="l">
 									<FormField label="タイトル" errorText={errors.title}>
