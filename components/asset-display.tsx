@@ -53,7 +53,7 @@ export function AssetDisplay({
 					<Icon
 						name={type === "audio" ? "audio-full" : "file"}
 						variant="normal"
-						className="text-cyan-500"
+						className={hasAsset ? "!text-cyan-500" : "!text-slate-300"}
 						ariaLabel={displayLabel}
 					/>
 				)}
@@ -111,7 +111,7 @@ export function PendingAssetDisplay({
 						) : (
 							<Icon
 								name={type === "audio" ? "audio-full" : "file"}
-								className="text-cyan-500"
+								className="!text-cyan-500"
 								ariaLabel={label}
 							/>
 						)}
