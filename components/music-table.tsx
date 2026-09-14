@@ -23,7 +23,7 @@ export default function MusicTable({ data }: { data: MusicListResponse }) {
 						<div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded border border-slate-300">
 							{item.music.jacket ? (
 								<Image
-									src={item.music.jacket}
+									src={item.music.jacket.url}
 									alt={`${item.music.title} のジャケット`}
 									width={32}
 									height={32}

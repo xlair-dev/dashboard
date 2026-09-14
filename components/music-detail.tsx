@@ -83,13 +83,13 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 							<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 								<AssetDisplay
 									type="jacket"
-									url={music.jacket}
-									updatedAt={music.jacketUpdatedAt}
+									url={music.jacket?.url ?? null}
+									updatedAt={music.jacket?.updatedAt ?? null}
 								/>
 								<AssetDisplay
 									type="audio"
-									url={music.music}
-									updatedAt={music.musicUpdatedAt}
+									url={music.audio?.url ?? null}
+									updatedAt={music.audio?.updatedAt ?? null}
 								/>
 							</div>
 							<div className="grid grid-cols-1 gap-4 md:grid-cols-3">

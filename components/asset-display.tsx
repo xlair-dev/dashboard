@@ -74,8 +74,8 @@ export function chartAssetDisplay(sheet: Sheet, label?: string) {
 	return (
 		<AssetDisplay
 			type="chart"
-			url={sheet.src}
-			updatedAt={sheet.chartUpdatedAt}
+			url={sheet.chart?.url ?? null}
+			updatedAt={sheet.chart?.updatedAt ?? null}
 			label={label}
 		/>
 	);

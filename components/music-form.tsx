@@ -82,7 +82,7 @@ function initialValues(data?: MusicWithSheets): FormValues {
 					id: sheet?.id,
 					level: sheet ? String(sheet.level) : "",
 					notesDesigner: sheet?.notesDesigner ?? "",
-					chart: sheet?.src ?? null,
+					chart: sheet?.chart?.url ?? null,
 				},
 			];
 		}),
@@ -92,8 +92,8 @@ function initialValues(data?: MusicWithSheets): FormValues {
 		artist: data?.music.artist ?? "",
 		bpm: data ? String(data.music.bpm) : "",
 		genre: data?.music.genre ?? "ORIGINAL",
-		jacket: data?.music.jacket || null,
-		audio: data?.music.music || null,
+		jacket: data?.music.jacket?.url ?? null,
+		audio: data?.music.audio?.url ?? null,
 		registrationDate: data?.music.registrationDate.slice(0, 10) ?? "",
 		isTest: data?.music.isTest ?? false,
 		sheets,
@@ -450,7 +450,7 @@ export default function MusicForm({
 												<AssetDisplay
 													type="jacket"
 													url={previewUrl ?? null}
-													updatedAt={data?.music.jacketUpdatedAt ?? null}
+													updatedAt={data?.music.jacket?.updatedAt ?? null}
 													fileName={jacketFile[0]?.name}
 												/>
 												{data && !jacketPreviewUrl && values.jacket ? (
@@ -471,7 +471,7 @@ export default function MusicForm({
 										<AssetDisplay
 											type="audio"
 											url={audioFile.length ? null : values.audio}
-											updatedAt={data?.music.musicUpdatedAt ?? null}
+											updatedAt={data?.music.audio?.updatedAt ?? null}
 											fileName={audioFile[0]?.name}
 										/>
 										{!audioFile.length && !values.audio ? (
@@ -569,7 +569,7 @@ export default function MusicForm({
 																updatedAt={
 																	data?.sheets.find(
 																		(item) => item.difficulty === key,
-																	)?.chartUpdatedAt ?? null
+																	)?.chart?.updatedAt ?? null
 																}
 																fileName={chartFiles[key][0]?.name}
 																label={label}
