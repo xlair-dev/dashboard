@@ -21,16 +21,16 @@ export default function MusicTable({ data }: { data: MusicListResponse }) {
 					header: "ジャケット",
 					cell: (item) =>
 						item.music.jacket ? (
-							<div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded border border-slate-300">
+							<div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded border border-slate-300">
 								<Image
 									src={item.music.jacket.url}
 									alt={`${item.music.title} のジャケット`}
-									width={32}
-									height={32}
+									fill
+									sizes="32px"
 									loading={
 										item.music.id === eagerJacketMusicId ? "eager" : "lazy"
 									}
-									className="size-8 object-cover"
+									className="object-cover"
 									unoptimized
 								/>
 							</div>
