@@ -38,6 +38,12 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 	return (
 		<DashboardLayout activeHref="/musics">
 			<ContentLayout
+				breadcrumbs={
+					<MusicBreadcrumbs
+						current={music.title}
+						currentHref={`/musics/${encodeURIComponent(music.id)}`}
+					/>
+				}
 				header={
 					<Header
 						variant="h1"
@@ -45,12 +51,6 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 					>
 						{music.title}
 					</Header>
-				}
-				breadcrumbs={
-					<MusicBreadcrumbs
-						current={music.title}
-						currentHref={`/musics/${encodeURIComponent(music.id)}`}
-					/>
 				}
 			>
 				<SpaceBetween size="l">
