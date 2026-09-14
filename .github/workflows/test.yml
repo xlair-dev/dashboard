@@ -5,6 +5,10 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/test.yml"
+      - ".github/workflows/**"
+      - "Dockerfile"
+      - ".dockerignore"
+      - "compose.yml"
       - "**/*.ts"
       - "**/*.tsx"
       - "**/*.mjs"
@@ -14,6 +18,10 @@ on:
   pull_request:
     paths:
       - ".github/workflows/test.yml"
+      - ".github/workflows/**"
+      - "Dockerfile"
+      - ".dockerignore"
+      - "compose.yml"
       - "**/*.ts"
       - "**/*.tsx"
       - "**/*.mjs"
