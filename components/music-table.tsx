@@ -24,12 +24,12 @@ export default function MusicTable({ data }: { data: MusicListResponse }) {
 							<Image
 								src={item.music.jacket}
 								alt={`${item.music.title} のジャケット`}
-								width={48}
-								height={48}
+								width={32}
+								height={32}
 								loading={
 									item.music.id === eagerJacketMusicId ? "eager" : "lazy"
 								}
-								className="size-12 object-cover"
+								className="size-8 object-cover"
 								unoptimized
 							/>
 						) : (
