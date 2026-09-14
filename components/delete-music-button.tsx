@@ -8,6 +8,32 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { deleteMusicAction } from "@/app/musics/actions";
 
+const destructiveIconStyle = {
+	root: {
+		color: {
+			active: "#7d2100",
+			default: "#d13212",
+			hover: "#a91b0c",
+		},
+	},
+};
+
+const destructiveActionStyle = {
+	root: {
+		background: {
+			active: "#a91b0c",
+			default: "#d13212",
+			hover: "#a91b0c",
+		},
+		borderColor: {
+			active: "#7d2100",
+			default: "#d13212",
+			hover: "#a91b0c",
+		},
+		color: { default: "#ffffff" },
+	},
+};
+
 export default function DeleteMusicButton({ musicId }: { musicId: string }) {
 	const router = useRouter();
 	const [visible, setVisible] = useState(false);
@@ -28,9 +54,13 @@ export default function DeleteMusicButton({ musicId }: { musicId: string }) {
 
 	return (
 		<>
-			<Button variant="normal" onClick={() => setVisible(true)}>
-				削除
-			</Button>
+			<Button
+				ariaLabel="楽曲を削除"
+				iconName="delete-marker"
+				style={destructiveIconStyle}
+				variant="icon"
+				onClick={() => setVisible(true)}
+			/>
 			<Modal
 				visible={visible}
 				onDismiss={() => setVisible(false)}
@@ -41,6 +71,7 @@ export default function DeleteMusicButton({ musicId }: { musicId: string }) {
 							キャンセル
 						</Button>
 						<Button
+							style={destructiveActionStyle}
 							variant="primary"
 							onClick={handleDelete}
 							loading={isPending}

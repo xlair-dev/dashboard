@@ -29,6 +29,7 @@ import {
 } from "@/app/musics/actions";
 import { AssetDisplay, PendingAssetDisplay } from "@/components/asset-display";
 import DashboardLayout from "@/components/dashboard-layout";
+import DeleteMusicButton from "@/components/delete-music-button";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
 import type {
 	CreateMusicInput,
@@ -710,6 +711,11 @@ export default function MusicForm({
 									})}
 								</SpaceBetween>
 							</Container>
+							{data ? (
+								<div className="flex justify-end">
+									<DeleteMusicButton musicId={data.music.id} />
+								</div>
+							) : null}
 						</SpaceBetween>
 					</Form>
 				</form>
