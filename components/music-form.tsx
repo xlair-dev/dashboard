@@ -41,6 +41,8 @@ type FormValues = {
 	sheets: Record<Difficulty, SheetDraft>;
 };
 
+const MAX_JACKET_SIZE = 5 * 1024 * 1024;
+
 const difficulties: Array<{ key: Difficulty; label: string }> = [
 	{ key: "easy", label: "Easy" },
 	{ key: "normal", label: "Normal" },
@@ -89,6 +91,7 @@ export default function MusicForm({
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isDeletingJacket, setIsDeletingJacket] = useState(false);
 	const [jacketFile, setJacketFile] = useState<File[]>([]);
+	const [jacketError, setJacketError] = useState<string>();
 	const router = useRouter();
 
 	const isEdit = Boolean(data);
@@ -107,6 +110,7 @@ export default function MusicForm({
 		else if (!/^\d{4}-\d{2}-\d{2}$/.test(values.registrationDate))
 			nextErrors.registrationDate =
 				"登録日は YYYY-MM-DD 形式で入力してください。";
+		if (jacketError) nextErrors.jacket = jacketError;
 		if (!isPositiveSingleDecimal(values.bpm))
 			nextErrors.bpm = "BPM は正の数値（小数第1位まで）で入力してください。";
 		for (const { key, label } of difficulties) {
@@ -183,6 +187,7 @@ export default function MusicForm({
 			await deleteJacketAction(data.music.id);
 			setValues((current) => ({ ...current, jacket: "" }));
 			setJacketFile([]);
+			setJacketError(undefined);
 		} catch (error) {
 			setSubmitError(
 				error instanceof Error
@@ -261,13 +266,25 @@ export default function MusicForm({
 									>
 										<Input value="ORIGINAL" disabled />
 									</FormField>
-									<FormField label="ジャケット" errorText={errors.jacket}>
+									<FormField label="ジャケット" errorText={jacketError}>
 										<SpaceBetween size="s">
 											<FileUpload
 												accept="image/jpeg,image/png,image/webp"
 												showFileThumbnail
 												value={jacketFile}
-												onChange={({ detail }) => setJacketFile(detail.value)}
+												constraintText="最大 5 MiB"
+												onChange={({ detail }) => {
+													const file = detail.value[0];
+													if (file && file.size > MAX_JACKET_SIZE) {
+														setJacketFile([]);
+														setJacketError(
+															"ジャケットは 5 MiB 以下にしてください。",
+														);
+														return;
+													}
+													setJacketFile(detail.value);
+													setJacketError(undefined);
+												}}
 												i18nStrings={{
 													uploadButtonText: () => "画像を選択",
 													dropzoneText: () => "画像をここにドロップ",
