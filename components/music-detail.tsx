@@ -26,6 +26,12 @@ const difficultyLabels = {
 	master: "Master",
 } as const;
 
+const difficultyColumns = {
+	basic: "md:col-start-1",
+	advanced: "md:col-start-2",
+	master: "md:col-start-3",
+} as const;
+
 export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 	const { music } = data;
 
@@ -93,14 +99,10 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 										updatedAt={music.audio?.updatedAt ?? null}
 									/>
 								</div>
-								{data.sheets.map((sheet, index) => (
+								{data.sheets.map((sheet) => (
 									<div
 										key={sheet.id}
-										className={
-											["md:col-start-1", "md:col-start-2", "md:col-start-3"][
-												index
-											] ?? ""
-										}
+										className={difficultyColumns[sheet.difficulty]}
 									>
 										{chartAssetDisplay(
 											sheet,

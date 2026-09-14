@@ -11,7 +11,6 @@ type AssetDisplayProps = {
 	url: string | null;
 	updatedAt: string | null;
 	label?: string;
-	showUpdatedAt?: boolean;
 };
 
 const assetLabels: Record<AssetType, string> = {
@@ -31,7 +30,6 @@ export function AssetDisplay({
 	url,
 	updatedAt,
 	label,
-	showUpdatedAt = true,
 }: AssetDisplayProps) {
 	const hasAsset = Boolean(url);
 	const displayLabel = label ?? assetLabels[type];
@@ -60,11 +58,9 @@ export function AssetDisplay({
 			</div>
 			<div className="min-w-0">
 				<div className="truncate">{displayLabel}</div>
-				{showUpdatedAt && (
-					<div className="text-sm text-slate-600">
-						{hasAsset ? formatUpdatedAt(updatedAt) : "なし"}
-					</div>
-				)}
+				<div className="text-sm text-slate-600">
+					{hasAsset ? formatUpdatedAt(updatedAt) : "なし"}
+				</div>
 			</div>
 		</div>
 	);
