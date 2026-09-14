@@ -86,7 +86,7 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 									url={music.jacket?.url ?? null}
 									updatedAt={music.jacket?.updatedAt ?? null}
 								/>
-								<div className="md:col-start-3">
+								<div className="md:col-start-2">
 									<AssetDisplay
 										type="audio"
 										url={music.audio?.url ?? null}

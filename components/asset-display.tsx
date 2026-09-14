@@ -1,4 +1,7 @@
+import Button from "@cloudscape-design/components/button";
+import Container from "@cloudscape-design/components/container";
 import Icon from "@cloudscape-design/components/icon";
+import SpaceBetween from "@cloudscape-design/components/space-between";
 import Image from "next/image";
 
 import type { Sheet } from "@/lib/api";
@@ -77,5 +80,38 @@ export function chartAssetDisplay(sheet: Sheet, label?: string) {
 			updatedAt={sheet.chart?.updatedAt ?? null}
 			label={label}
 		/>
+	);
+}
+
+export function PendingAssetDisplay({
+	type,
+	fileName,
+	onRemove,
+}: {
+	type: AssetType;
+	fileName: string;
+	onRemove: () => void;
+}) {
+	const label = assetLabels[type];
+
+	return (
+		<Container>
+			<SpaceBetween direction="horizontal" size="s" alignItems="center">
+				<SpaceBetween direction="horizontal" size="s" alignItems="center">
+					<Icon
+						name={type === "audio" ? "audio-full" : "file"}
+						className="text-cyan-500"
+						ariaLabel={label}
+					/>
+					<span className="break-all">{fileName}</span>
+				</SpaceBetween>
+				<Button
+					variant="icon"
+					iconName="close"
+					ariaLabel={`${label}を選択解除`}
+					onClick={onRemove}
+				/>
+			</SpaceBetween>
+		</Container>
 	);
 }

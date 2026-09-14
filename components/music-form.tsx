@@ -23,7 +23,7 @@ import {
 	deleteJacketAction,
 	updateMusicAction,
 } from "@/app/musics/actions";
-import { AssetDisplay } from "@/components/asset-display";
+import { AssetDisplay, PendingAssetDisplay } from "@/components/asset-display";
 import DashboardLayout from "@/components/dashboard-layout";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
 import type {
@@ -425,12 +425,19 @@ export default function MusicForm({
 											/>
 										) : null}
 										{jacketFile[0] ? (
-											<AssetDisplay
-												type="jacket"
-												url={jacketPreviewUrl ?? null}
-												updatedAt={null}
-												showUpdatedAt={false}
-											/>
+											<SpaceBetween size="s">
+												<PendingAssetDisplay
+													type="jacket"
+													fileName={jacketFile[0].name}
+													onRemove={() => setJacketFile([])}
+												/>
+												<AssetDisplay
+													type="jacket"
+													url={jacketPreviewUrl ?? null}
+													updatedAt={null}
+													showUpdatedAt={false}
+												/>
+											</SpaceBetween>
 										) : null}
 										{data && !jacketFile.length && values.jacket ? (
 											<SpaceBetween size="s">
@@ -475,6 +482,13 @@ export default function MusicForm({
 													dropzoneText: () => "WAV ファイルをここにドロップ",
 													removeFileAriaLabel: () => "音源を削除",
 												}}
+											/>
+										) : null}
+										{audioFile[0] ? (
+											<PendingAssetDisplay
+												type="audio"
+												fileName={audioFile[0].name}
+												onRemove={() => setAudioFile([])}
 											/>
 										) : null}
 										{!audioFile.length && values.audio ? (
@@ -560,6 +574,18 @@ export default function MusicForm({
 																			"SUS ファイルをここにドロップ",
 																		removeFileAriaLabel: () => "譜面を削除",
 																	}}
+																/>
+															) : null}
+															{chartFiles[key][0] ? (
+																<PendingAssetDisplay
+																	type="chart"
+																	fileName={chartFiles[key][0].name}
+																	onRemove={() =>
+																		setChartFiles((current) => ({
+																			...current,
+																			[key]: [],
+																		}))
+																	}
 																/>
 															) : null}
 															{!chartFiles[key].length && sheet.chart ? (
