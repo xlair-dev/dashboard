@@ -381,7 +381,11 @@ export default function MusicForm({
 					<Form
 						actions={
 							<div className="flex w-full flex-wrap items-center gap-4">
-								{data ? <DeleteMusicButton musicId={data.music.id} /> : null}
+								{data ? (
+									<div className="mr-auto">
+										<DeleteMusicButton musicId={data.music.id} />
+									</div>
+								) : null}
 								{saveProgress ? (
 									<div className="w-full min-w-0 flex-1">
 										<ProgressBar
