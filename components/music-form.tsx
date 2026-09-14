@@ -379,13 +379,11 @@ export default function MusicForm({
 			>
 				<form onSubmit={handleSubmit}>
 					<Form
+						secondaryActions={
+							data ? <DeleteMusicButton musicId={data.music.id} /> : null
+						}
 						actions={
-							<div className="flex w-full flex-wrap items-center gap-4">
-								{data ? (
-									<div className="mr-auto">
-										<DeleteMusicButton musicId={data.music.id} />
-									</div>
-								) : null}
+							<div className="flex flex-wrap items-center gap-4">
 								{saveProgress ? (
 									<div className="w-full min-w-0 flex-1">
 										<ProgressBar
