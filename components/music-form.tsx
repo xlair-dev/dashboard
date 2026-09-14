@@ -11,17 +11,21 @@ import Form from "@cloudscape-design/components/form";
 import FormField from "@cloudscape-design/components/form-field";
 import Header from "@cloudscape-design/components/header";
 import Input from "@cloudscape-design/components/input";
+import ProgressBar from "@cloudscape-design/components/progress-bar";
 import Select from "@cloudscape-design/components/select";
 import SpaceBetween from "@cloudscape-design/components/space-between";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import {
-	createMusicAction,
+	createMusicMetadataAction,
 	deleteAudioAction,
 	deleteChartAction,
 	deleteJacketAction,
-	updateMusicAction,
+	updateMusicMetadataAction,
+	uploadAudioAction,
+	uploadChartAction,
+	uploadJacketAction,
 } from "@/app/musics/actions";
 import { AssetDisplay, PendingAssetDisplay } from "@/components/asset-display";
 import DashboardLayout from "@/components/dashboard-layout";
@@ -51,6 +55,7 @@ type FormValues = {
 	isTest: boolean;
 	sheets: Record<Difficulty, SheetDraft>;
 };
+type SaveProgress = { current: number; total: number; label: string };
 
 const difficulties: Array<{ key: Difficulty; label: string }> = [
 	{ key: "basic", label: "Basic" },
@@ -114,6 +119,7 @@ export default function MusicForm({
 	const [isDeletingJacket, setIsDeletingJacket] = useState(false);
 	const [isDeletingAudio, setIsDeletingAudio] = useState(false);
 	const [deletingChart, setDeletingChart] = useState<Difficulty>();
+	const [saveProgress, setSaveProgress] = useState<SaveProgress>();
 	const [jacketFile, setJacketFile] = useState<File[]>([]);
 	const [audioFile, setAudioFile] = useState<File[]>([]);
 	const [chartFiles, setChartFiles] = useState<Record<Difficulty, File[]>>({
@@ -201,50 +207,81 @@ export default function MusicForm({
 				registrationDate: `${values.registrationDate}T00:00:00.000Z`,
 				isTest: values.isTest,
 			};
+			const uploadCount =
+				Number(Boolean(jacketFile[0])) +
+				Number(Boolean(audioFile[0])) +
+				difficulties.filter(({ key }) => chartFiles[key][0]).length;
+			const totalSteps = 1 + uploadCount;
+			setSaveProgress({
+				current: 0,
+				total: totalSteps,
+				label: "楽曲情報を保存中",
+			});
+			let saved: MusicWithSheets;
 			if (data) {
-				await updateMusicAction(
-					data.music.id,
-					{
-						...fields,
-						sheets: difficulties.map(({ key }) => ({
-							id: values.sheets[key].id as string,
-							difficulty: key,
-							level: Number(values.sheets[key].level),
-							notesDesigner: values.sheets[key].notesDesigner.trim(),
-						})),
-					} satisfies UpdateMusicInput,
-					jacketFile[0],
-					audioFile[0],
-					difficulties.flatMap(({ key }) =>
-						chartFiles[key][0]
-							? [{ difficulty: key, file: chartFiles[key][0] }]
-							: [],
-					),
-				);
+				saved = await updateMusicMetadataAction(data.music.id, {
+					...fields,
+					sheets: difficulties.map(({ key }) => ({
+						id: values.sheets[key].id as string,
+						difficulty: key,
+						level: Number(values.sheets[key].level),
+						notesDesigner: values.sheets[key].notesDesigner.trim(),
+					})),
+				} satisfies UpdateMusicInput);
 			} else {
-				await createMusicAction(
-					{
-						...fields,
-						sheets: difficulties.map(({ key }) => ({
-							difficulty: key,
-							level: Number(values.sheets[key].level),
-							notesDesigner: values.sheets[key].notesDesigner.trim(),
-						})),
-					} satisfies CreateMusicInput,
-					jacketFile[0],
-					audioFile[0],
-					difficulties.flatMap(({ key }) =>
-						chartFiles[key][0]
-							? [{ difficulty: key, file: chartFiles[key][0] }]
-							: [],
-					),
-				);
+				saved = await createMusicMetadataAction({
+					...fields,
+					sheets: difficulties.map(({ key }) => ({
+						difficulty: key,
+						level: Number(values.sheets[key].level),
+						notesDesigner: values.sheets[key].notesDesigner.trim(),
+					})),
+				} satisfies CreateMusicInput);
+			}
+			let currentStep = 1;
+			setSaveProgress({
+				current: currentStep,
+				total: totalSteps,
+				label: "楽曲情報を保存しました",
+			});
+
+			if (jacketFile[0]) {
+				setSaveProgress({
+					current: currentStep,
+					total: totalSteps,
+					label: "ジャケットをアップロード中",
+				});
+				saved = await uploadJacketAction(saved.music.id, jacketFile[0]);
+				currentStep += 1;
+			}
+			if (audioFile[0]) {
+				setSaveProgress({
+					current: currentStep,
+					total: totalSteps,
+					label: "音源をアップロード中",
+				});
+				saved = await uploadAudioAction(saved.music.id, audioFile[0]);
+				currentStep += 1;
+			}
+			for (const { key, label } of difficulties) {
+				const file = chartFiles[key][0];
+				if (!file) continue;
+				const sheet = saved.sheets.find((item) => item.difficulty === key);
+				if (!sheet) throw new Error(`${label} の譜面が見つかりません。`);
+				setSaveProgress({
+					current: currentStep,
+					total: totalSteps,
+					label: `${label} の譜面をアップロード中`,
+				});
+				saved = await uploadChartAction(sheet.id, file);
+				currentStep += 1;
 			}
 			router.push(data ? `/musics/${data.music.id}` : "/musics");
 		} catch (error) {
 			showError(error, "保存に失敗しました。");
 		} finally {
 			setIsSubmitting(false);
+			setSaveProgress(undefined);
 		}
 	}
 
@@ -312,6 +349,15 @@ export default function MusicForm({
 								onDismiss: () => setErrorNotification(undefined),
 							},
 						]}
+					/>
+				</div>
+			) : null}
+			{saveProgress ? (
+				<div className="mb-4">
+					<ProgressBar
+						value={(saveProgress.current / saveProgress.total) * 100}
+						label={saveProgress.label}
+						description={`${saveProgress.current} / ${saveProgress.total}`}
 					/>
 				</div>
 			) : null}
