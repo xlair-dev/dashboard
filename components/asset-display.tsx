@@ -1,6 +1,5 @@
 import Button from "@cloudscape-design/components/button";
 import Icon from "@cloudscape-design/components/icon";
-import SpaceBetween from "@cloudscape-design/components/space-between";
 import Image from "next/image";
 
 import type { Sheet } from "@/lib/api";
@@ -96,9 +95,9 @@ export function PendingAssetDisplay({
 	const label = assetLabels[type];
 
 	return (
-		<div className="rounded-[8px] border-2 border-[#006ce0] bg-[#f0fbff] p-4">
-			<SpaceBetween direction="horizontal" size="s" alignItems="center">
-				<SpaceBetween direction="horizontal" size="s" alignItems="center">
+		<div className="w-full rounded-[8px] border-2 border-[#006ce0] bg-[#f0fbff] p-4">
+			<div className="flex w-full items-center justify-between gap-3">
+				<div className="flex min-w-0 items-center gap-3">
 					<div className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded border border-slate-300">
 						{type === "jacket" && previewUrl ? (
 							<Image
@@ -117,15 +116,15 @@ export function PendingAssetDisplay({
 							/>
 						)}
 					</div>
-					<span className="break-all">{fileName}</span>
-				</SpaceBetween>
+					<span className="min-w-0 break-all">{fileName}</span>
+				</div>
 				<Button
 					variant="icon"
 					iconName="close"
 					ariaLabel={`${label}を選択解除`}
 					onClick={onRemove}
 				/>
-			</SpaceBetween>
+			</div>
 		</div>
 	);
 }
