@@ -12,8 +12,9 @@ export type Sheet = {
 	difficulty: "basic" | "advanced" | "master";
 	level: number;
 	notesDesigner: string;
-	src: string | null;
+	chart: Asset | null;
 };
+export type Asset = { url: string; updatedAt: string };
 export type Genre = "ORIGINAL" | "EXTERNAL" | "OTHER";
 export type Music = {
 	id: string;
@@ -21,8 +22,8 @@ export type Music = {
 	artist: string;
 	bpm: number;
 	genre: Genre;
-	jacket: string | null;
-	music: string | null;
+	jacket: Asset | null;
+	audio: Asset | null;
 	registrationDate: string;
 	isTest: boolean;
 };
@@ -36,16 +37,20 @@ function assetUrl(path: string | null): string | null {
 	return path ? new URL(path, process.env.API_BASE_URL).toString() : null;
 }
 
+function normalizeAsset(asset: Asset | null): Asset | null {
+	return asset ? { ...asset, url: assetUrl(asset.url) ?? asset.url } : null;
+}
+
 function normalizeMusic(value: MusicWithSheets): MusicWithSheets {
 	return {
 		music: {
 			...value.music,
-			jacket: assetUrl(value.music.jacket),
-			music: assetUrl(value.music.music),
+			jacket: normalizeAsset(value.music.jacket),
+			audio: normalizeAsset(value.music.audio),
 		},
 		sheets: value.sheets.map((sheet) => ({
 			...sheet,
-			src: assetUrl(sheet.src),
+			chart: normalizeAsset(sheet.chart),
 		})),
 	};
 }

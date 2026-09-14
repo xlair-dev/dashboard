@@ -7,9 +7,8 @@ import CopyToClipboard from "@cloudscape-design/components/copy-to-clipboard";
 import Header from "@cloudscape-design/components/header";
 import SpaceBetween from "@cloudscape-design/components/space-between";
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import type { ReactNode } from "react";
-
+import { AssetDisplay, chartAssetDisplay } from "@/components/asset-display";
 import DashboardLayout from "@/components/dashboard-layout";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
 import type { MusicWithSheets } from "@/lib/api";
@@ -80,19 +79,30 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 						</dl>
 					</Container>
 					<Container header={<Header variant="h2">アセット</Header>}>
-						{music.jacket ? (
-							<Image
-								src={music.jacket}
-								alt={`${music.title} のジャケット`}
-								width={192}
-								height={192}
-								loading="eager"
-								className="size-48 object-cover"
-								unoptimized
-							/>
-						) : (
-							"ジャケット未設定"
-						)}
+						<SpaceBetween size="l">
+							<div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+								<AssetDisplay
+									type="jacket"
+									url={music.jacket?.url ?? null}
+									updatedAt={music.jacket?.updatedAt ?? null}
+								/>
+								<AssetDisplay
+									type="audio"
+									url={music.audio?.url ?? null}
+									updatedAt={music.audio?.updatedAt ?? null}
+								/>
+							</div>
+							<div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+								{data.sheets.map((sheet) => (
+									<div key={sheet.id}>
+										{chartAssetDisplay(
+											sheet,
+											difficultyLabels[sheet.difficulty],
+										)}
+									</div>
+								))}
+							</div>
+						</SpaceBetween>
 					</Container>
 					<MusicSheetsTable
 						sheets={data.sheets.map((sheet) => ({

@@ -19,22 +19,25 @@ export default function MusicTable({ data }: { data: MusicListResponse }) {
 			columnDefinitions={[
 				{
 					header: "ジャケット",
-					cell: (item) =>
-						item.music.jacket ? (
-							<Image
-								src={item.music.jacket}
-								alt={`${item.music.title} のジャケット`}
-								width={32}
-								height={32}
-								loading={
-									item.music.id === eagerJacketMusicId ? "eager" : "lazy"
-								}
-								className="size-8 object-cover"
-								unoptimized
-							/>
-						) : (
-							<span>未設定</span>
-						),
+					cell: (item) => (
+						<div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded border border-slate-300">
+							{item.music.jacket ? (
+								<Image
+									src={item.music.jacket.url}
+									alt={`${item.music.title} のジャケット`}
+									width={32}
+									height={32}
+									loading={
+										item.music.id === eagerJacketMusicId ? "eager" : "lazy"
+									}
+									className="size-8 object-cover"
+									unoptimized
+								/>
+							) : (
+								<span className="text-xs text-slate-500">なし</span>
+							)}
+						</div>
+					),
 				},
 				{
 					header: "タイトル",
