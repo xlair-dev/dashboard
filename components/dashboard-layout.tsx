@@ -22,7 +22,7 @@ export default function DashboardLayout({
 	children: ReactNode;
 }) {
 	return (
-		<div className="min-h-screen min-w-80">
+		<div className="dashboard-layout min-h-screen min-w-80">
 			<TopNavigation
 				id="dashboard-header"
 				identity={{ href: "/", title: "XLAIR Dashboard" }}
@@ -37,7 +37,11 @@ export default function DashboardLayout({
 					/>
 				}
 				breadcrumbs={breadcrumbs}
-				contentHeader={contentHeader}
+				contentHeader={
+					contentHeader ? (
+						<div className="dashboard-content-header">{contentHeader}</div>
+					) : undefined
+				}
 				// Remove toolsHide when an AppLayout tools panel is introduced.
 				toolsHide
 				content={children}
