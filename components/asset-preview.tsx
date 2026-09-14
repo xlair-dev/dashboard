@@ -72,7 +72,7 @@ export default function AssetPreview({
 				onDismiss={() => setIsOpen(false)}
 				header={label}
 				closeAriaLabel="プレビューを閉じる"
-				size="max"
+				size="large"
 			>
 				<SpaceBetween size="s">
 					{/* Audio previews contain no spoken content requiring captions. */}

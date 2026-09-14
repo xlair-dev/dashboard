@@ -94,16 +94,16 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 									updatedAt={music.jacket?.updatedAt ?? null}
 								/>
 								<div className="md:col-start-2">
+									<AssetPreview
+										type="audio"
+										url={music.audio?.url}
+										label="音源"
+									/>
 									<AssetDisplay
 										type="audio"
 										url={music.audio?.url ?? null}
 										updatedAt={music.audio?.updatedAt ?? null}
 										showLabel={false}
-									/>
-									<AssetPreview
-										type="audio"
-										url={music.audio?.url}
-										label="音源"
 									/>
 								</div>
 								{data.sheets.map((sheet) => (
@@ -111,16 +111,16 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 										key={sheet.id}
 										className={difficultyColumns[sheet.difficulty]}
 									>
-										{chartAssetDisplay(
-											sheet,
-											difficultyLabels[sheet.difficulty],
-											false,
-										)}
 										<AssetPreview
 											type="chart"
 											url={sheet.chart?.url}
 											label={difficultyLabels[sheet.difficulty]}
 										/>
+										{chartAssetDisplay(
+											sheet,
+											difficultyLabels[sheet.difficulty],
+											false,
+										)}
 									</div>
 								))}
 							</div>

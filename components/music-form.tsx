@@ -565,6 +565,11 @@ export default function MusicForm({
 										) : null}
 										{!audioFile.length && values.audio ? (
 											<SpaceBetween size="s">
+												<AssetPreview
+													type="audio"
+													url={values.audio}
+													label="音源"
+												/>
 												<AssetDisplay
 													type="audio"
 													url={values.audio}
@@ -578,11 +583,6 @@ export default function MusicForm({
 												>
 													音源を削除
 												</Button>
-												<AssetPreview
-													type="audio"
-													url={values.audio}
-													label="音源"
-												/>
 											</SpaceBetween>
 										) : null}
 									</SpaceBetween>
@@ -675,6 +675,11 @@ export default function MusicForm({
 															) : null}
 															{!chartFiles[key].length && sheet.chart ? (
 																<SpaceBetween size="s">
+																	<AssetPreview
+																		type="chart"
+																		url={sheet.chart}
+																		label={label}
+																	/>
 																	<AssetDisplay
 																		type="chart"
 																		url={sheet.chart}
@@ -695,11 +700,6 @@ export default function MusicForm({
 																	>
 																		譜面を削除
 																	</Button>
-																	<AssetPreview
-																		type="chart"
-																		url={sheet.chart}
-																		label={label}
-																	/>
 																</SpaceBetween>
 															) : null}
 														</SpaceBetween>
