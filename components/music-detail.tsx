@@ -22,9 +22,9 @@ const MusicSheetsTable = dynamic(
 );
 
 const difficultyLabels = {
-	easy: "Easy",
-	normal: "Normal",
-	hard: "Hard",
+	basic: "Basic",
+	advanced: "Advanced",
+	master: "Master",
 } as const;
 
 export default function MusicDetail({ data }: { data: MusicWithSheets }) {
@@ -68,23 +68,6 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 							<DetailItem label="BPM" value={String(music.bpm)} />
 							<DetailItem label="ジャンル" value={music.genre} />
 							<DetailItem
-								label="ジャケット"
-								value={
-									music.jacket ? (
-										<Image
-											src={music.jacket}
-											alt={`${music.title} のジャケット`}
-											width={192}
-											height={192}
-											className="size-48 object-cover"
-											unoptimized
-										/>
-									) : (
-										"未設定"
-									)
-								}
-							/>
-							<DetailItem
 								label="登録日時"
 								value={new Date(music.registrationDate).toLocaleDateString(
 									"ja-JP",
@@ -95,6 +78,21 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 								value={music.isTest ? "はい" : "いいえ"}
 							/>
 						</dl>
+					</Container>
+					<Container header={<Header variant="h2">アセット</Header>}>
+						{music.jacket ? (
+							<Image
+								src={music.jacket}
+								alt={`${music.title} のジャケット`}
+								width={192}
+								height={192}
+								loading="eager"
+								className="size-48 object-cover"
+								unoptimized
+							/>
+						) : (
+							"ジャケット未設定"
+						)}
 					</Container>
 					<MusicSheetsTable
 						sheets={data.sheets.map((sheet) => ({

@@ -11,13 +11,16 @@ import Form from "@cloudscape-design/components/form";
 import FormField from "@cloudscape-design/components/form-field";
 import Header from "@cloudscape-design/components/header";
 import Input from "@cloudscape-design/components/input";
+import Select from "@cloudscape-design/components/select";
 import SpaceBetween from "@cloudscape-design/components/space-between";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
 	createMusicAction,
+	deleteAudioAction,
+	deleteChartAction,
 	deleteJacketAction,
 	updateMusicAction,
 } from "@/app/musics/actions";
@@ -25,29 +28,45 @@ import DashboardLayout from "@/components/dashboard-layout";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
 import type {
 	CreateMusicInput,
+	Genre,
 	MusicWithSheets,
 	UpdateMusicInput,
 } from "@/lib/api";
 
-type Difficulty = "easy" | "normal" | "hard";
-type SheetDraft = { id?: string; level: string; notesDesigner: string };
+type Difficulty = "basic" | "advanced" | "master";
+type SheetDraft = {
+	id?: string;
+	level: string;
+	notesDesigner: string;
+	chart: string | null;
+};
 type FormValues = {
 	title: string;
 	artist: string;
 	bpm: string;
-	jacket: string;
+	genre: Genre;
+	jacket: string | null;
+	audio: string | null;
 	registrationDate: string;
 	isTest: boolean;
 	sheets: Record<Difficulty, SheetDraft>;
 };
 
-const MAX_JACKET_SIZE = 5 * 1024 * 1024;
-
 const difficulties: Array<{ key: Difficulty; label: string }> = [
-	{ key: "easy", label: "Easy" },
-	{ key: "normal", label: "Normal" },
-	{ key: "hard", label: "Hard" },
+	{ key: "basic", label: "Basic" },
+	{ key: "advanced", label: "Advanced" },
+	{ key: "master", label: "Master" },
 ];
+
+const genres: Array<{ value: Genre; label: string }> = [
+	{ value: "ORIGINAL", label: "ORIGINAL" },
+	{ value: "EXTERNAL", label: "EXTERNAL" },
+	{ value: "OTHER", label: "OTHER" },
+];
+
+const MAX_JACKET_SIZE = 5 * 1024 * 1024;
+const MAX_AUDIO_SIZE = 30 * 1024 * 1024;
+const MAX_CHART_SIZE = 5 * 1024 * 1024;
 
 function isPositiveSingleDecimal(value: string) {
 	return /^\d+(\.\d)?$/.test(value) && Number(value) > 0;
@@ -63,6 +82,7 @@ function initialValues(data?: MusicWithSheets): FormValues {
 					id: sheet?.id,
 					level: sheet ? String(sheet.level) : "",
 					notesDesigner: sheet?.notesDesigner ?? "",
+					chart: sheet?.src ?? null,
 				},
 			];
 		}),
@@ -71,7 +91,9 @@ function initialValues(data?: MusicWithSheets): FormValues {
 		title: data?.music.title ?? "",
 		artist: data?.music.artist ?? "",
 		bpm: data ? String(data.music.bpm) : "",
-		jacket: data?.music.jacket ?? "",
+		genre: data?.music.genre ?? "ORIGINAL",
+		jacket: data?.music.jacket || null,
+		audio: data?.music.music || null,
 		registrationDate: data?.music.registrationDate.slice(0, 10) ?? "",
 		isTest: data?.music.isTest ?? false,
 		sheets,
@@ -90,18 +112,48 @@ export default function MusicForm({
 	const [submitError, setSubmitError] = useState<string>();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isDeletingJacket, setIsDeletingJacket] = useState(false);
+	const [isDeletingAudio, setIsDeletingAudio] = useState(false);
+	const [deletingChart, setDeletingChart] = useState<Difficulty>();
 	const [jacketFile, setJacketFile] = useState<File[]>([]);
-	const [jacketError, setJacketError] = useState<string>();
+	const [audioFile, setAudioFile] = useState<File[]>([]);
+	const [chartFiles, setChartFiles] = useState<Record<Difficulty, File[]>>({
+		basic: [],
+		advanced: [],
+		master: [],
+	});
+	const [assetErrors, setAssetErrors] = useState<Record<string, string>>({});
+	const [jacketPreviewUrl, setJacketPreviewUrl] = useState<string>();
 	const router = useRouter();
 
+	useEffect(() => {
+		const file = jacketFile[0];
+		if (!file) {
+			setJacketPreviewUrl(undefined);
+			return;
+		}
+
+		const url = URL.createObjectURL(file);
+		setJacketPreviewUrl(url);
+		return () => URL.revokeObjectURL(url);
+	}, [jacketFile]);
+
 	const isEdit = Boolean(data);
+	function setAssetError(field: string, message?: string) {
+		setAssetErrors((current) => {
+			const next = { ...current };
+			if (message) next[field] = message;
+			else delete next[field];
+			return next;
+		});
+	}
+
 	const updateValue = (
 		key: keyof Omit<FormValues, "sheets">,
 		value: string | boolean,
 	) => setValues((current) => ({ ...current, [key]: value }));
 
 	function validate() {
-		const nextErrors: Record<string, string> = {};
+		const nextErrors: Record<string, string> = { ...assetErrors };
 		if (!values.title.trim()) nextErrors.title = "タイトルを入力してください。";
 		if (!values.artist.trim())
 			nextErrors.artist = "アーティストを入力してください。";
@@ -110,7 +162,6 @@ export default function MusicForm({
 		else if (!/^\d{4}-\d{2}-\d{2}$/.test(values.registrationDate))
 			nextErrors.registrationDate =
 				"登録日は YYYY-MM-DD 形式で入力してください。";
-		if (jacketError) nextErrors.jacket = jacketError;
 		if (!isPositiveSingleDecimal(values.bpm))
 			nextErrors.bpm = "BPM は正の数値（小数第1位まで）で入力してください。";
 		for (const { key, label } of difficulties) {
@@ -138,7 +189,7 @@ export default function MusicForm({
 				title: values.title.trim(),
 				artist: values.artist.trim(),
 				bpm: Number(values.bpm),
-				genre: "ORIGINAL" as const,
+				genre: values.genre,
 				registrationDate: `${values.registrationDate}T00:00:00.000Z`,
 				isTest: values.isTest,
 			};
@@ -155,6 +206,12 @@ export default function MusicForm({
 						})),
 					} satisfies UpdateMusicInput,
 					jacketFile[0],
+					audioFile[0],
+					difficulties.flatMap(({ key }) =>
+						chartFiles[key][0]
+							? [{ difficulty: key, file: chartFiles[key][0] }]
+							: [],
+					),
 				);
 			} else {
 				await createMusicAction(
@@ -167,6 +224,12 @@ export default function MusicForm({
 						})),
 					} satisfies CreateMusicInput,
 					jacketFile[0],
+					audioFile[0],
+					difficulties.flatMap(({ key }) =>
+						chartFiles[key][0]
+							? [{ difficulty: key, file: chartFiles[key][0] }]
+							: [],
+					),
 				);
 			}
 			router.push(data ? `/musics/${data.music.id}` : "/musics");
@@ -185,9 +248,8 @@ export default function MusicForm({
 		setIsDeletingJacket(true);
 		try {
 			await deleteJacketAction(data.music.id);
-			setValues((current) => ({ ...current, jacket: "" }));
+			setValues((current) => ({ ...current, jacket: null }));
 			setJacketFile([]);
-			setJacketError(undefined);
 		} catch (error) {
 			setSubmitError(
 				error instanceof Error
@@ -198,6 +260,47 @@ export default function MusicForm({
 			setIsDeletingJacket(false);
 		}
 	}
+
+	async function handleDeleteAudio() {
+		if (!data) return;
+		setIsDeletingAudio(true);
+		try {
+			await deleteAudioAction(data.music.id);
+			setValues((current) => ({ ...current, audio: null }));
+		} catch (error) {
+			setSubmitError(
+				error instanceof Error ? error.message : "音源を削除できませんでした。",
+			);
+		} finally {
+			setIsDeletingAudio(false);
+		}
+	}
+
+	async function handleDeleteChart(key: Difficulty) {
+		const sheetId = values.sheets[key].id;
+		if (!sheetId) return;
+		setDeletingChart(key);
+		try {
+			await deleteChartAction(sheetId);
+			setValues((current) => ({
+				...current,
+				sheets: {
+					...current.sheets,
+					[key]: { ...current.sheets[key], chart: null },
+				},
+			}));
+		} catch (error) {
+			setSubmitError(
+				error instanceof Error
+					? error.message
+					: "譜面ファイルを削除できませんでした。",
+			);
+		} finally {
+			setDeletingChart(undefined);
+		}
+	}
+
+	const previewUrl = jacketPreviewUrl ?? values.jacket;
 
 	return (
 		<DashboardLayout activeHref="/musics">
@@ -260,59 +363,20 @@ export default function MusicForm({
 											}
 										/>
 									</FormField>
-									<FormField
-										label="ジャンル"
-										description="現在は ORIGINAL 固定です。"
-									>
-										<Input value="ORIGINAL" disabled />
-									</FormField>
-									<FormField label="ジャケット" errorText={jacketError}>
-										<SpaceBetween size="s">
-											<FileUpload
-												accept="image/jpeg,image/png,image/webp"
-												showFileThumbnail
-												value={jacketFile}
-												constraintText="最大 5 MiB"
-												onChange={({ detail }) => {
-													const file = detail.value[0];
-													if (file && file.size > MAX_JACKET_SIZE) {
-														setJacketFile([]);
-														setJacketError(
-															"ジャケットは 5 MiB 以下にしてください。",
-														);
-														return;
-													}
-													setJacketFile(detail.value);
-													setJacketError(undefined);
-												}}
-												i18nStrings={{
-													uploadButtonText: () => "画像を選択",
-													dropzoneText: () => "画像をここにドロップ",
-													removeFileAriaLabel: () => "画像を削除",
-												}}
-											/>
-											{values.jacket ? (
-												<SpaceBetween size="s">
-													<Image
-														src={values.jacket}
-														alt="ジャケットプレビュー"
-														width={128}
-														height={128}
-														className="size-32 object-cover"
-														unoptimized
-													/>
-													{data ? (
-														<Button
-															loading={isDeletingJacket}
-															disabled={isSubmitting || isDeletingJacket}
-															onClick={handleDeleteJacket}
-														>
-															ジャケットを削除
-														</Button>
-													) : null}
-												</SpaceBetween>
-											) : null}
-										</SpaceBetween>
+									<FormField label="ジャンル">
+										<Select
+											selectedOption={
+												genres.find(({ value }) => value === values.genre) ??
+												genres[0]
+											}
+											onChange={({ detail }) =>
+												updateValue(
+													"genre",
+													detail.selectedOption.value ?? "ORIGINAL",
+												)
+											}
+											options={genres}
+										/>
 									</FormField>
 									<FormField label="登録日" errorText={errors.registrationDate}>
 										<DatePicker
@@ -333,6 +397,135 @@ export default function MusicForm({
 										テスト楽曲
 									</Checkbox>
 								</SpaceBetween>
+							</Container>
+							<Container header={<Header variant="h2">アセット</Header>}>
+								<FormField label="ジャケット" errorText={assetErrors.jacket}>
+									<SpaceBetween size="s">
+										{!jacketFile.length && !values.jacket ? (
+											<FileUpload
+												accept="image/jpeg,image/png,image/webp"
+												value={jacketFile}
+												constraintText="最大 5 MiB"
+												onChange={({ detail }) => {
+													const file = detail.value[0];
+													if (file && file.size > MAX_JACKET_SIZE) {
+														setJacketFile([]);
+														setAssetError(
+															"jacket",
+															"ジャケットは 5 MiB 以下にしてください。",
+														);
+														return;
+													}
+													setJacketFile(detail.value);
+													setAssetError("jacket");
+												}}
+												i18nStrings={{
+													uploadButtonText: () => "画像を選択",
+													dropzoneText: () => "画像をここにドロップ",
+													removeFileAriaLabel: () => "画像を削除",
+												}}
+											/>
+										) : null}
+										{jacketFile[0] ? (
+											<Container>
+												<SpaceBetween
+													direction="horizontal"
+													size="s"
+													alignItems="center"
+												>
+													<span className="break-all">
+														{jacketFile[0].name}
+													</span>
+													<Button
+														variant="icon"
+														iconName="close"
+														ariaLabel="選択した画像を削除"
+														onClick={() => setJacketFile([])}
+													/>
+												</SpaceBetween>
+											</Container>
+										) : null}
+										{previewUrl ? (
+											<Container>
+												<SpaceBetween size="s">
+													<Image
+														src={previewUrl}
+														alt="ジャケットプレビュー"
+														width={128}
+														height={128}
+														loading="eager"
+														className="size-32 object-cover"
+														unoptimized
+													/>
+													{data && !jacketPreviewUrl ? (
+														<Button
+															loading={isDeletingJacket}
+															disabled={isSubmitting || isDeletingJacket}
+															onClick={handleDeleteJacket}
+														>
+															ジャケットを削除
+														</Button>
+													) : null}
+												</SpaceBetween>
+											</Container>
+										) : null}
+									</SpaceBetween>
+								</FormField>
+								<FormField label="音源" errorText={assetErrors.audio}>
+									<SpaceBetween size="s">
+										{!audioFile.length && !values.audio ? (
+											<FileUpload
+												accept="audio/wav"
+												value={audioFile}
+												constraintText="WAV、最大 30 MiB"
+												onChange={({ detail }) => {
+													const file = detail.value[0];
+													if (file && file.size > MAX_AUDIO_SIZE) {
+														setAudioFile([]);
+														setAssetError(
+															"audio",
+															"音源は 30 MiB 以下にしてください。",
+														);
+														return;
+													}
+													setAudioFile(detail.value);
+													setAssetError("audio");
+												}}
+												i18nStrings={{
+													uploadButtonText: () => "音源を選択",
+													dropzoneText: () => "WAV ファイルをここにドロップ",
+													removeFileAriaLabel: () => "音源を削除",
+												}}
+											/>
+										) : null}
+										{audioFile[0] ? (
+											<Container>
+												<SpaceBetween
+													direction="horizontal"
+													size="s"
+													alignItems="center"
+												>
+													<span className="break-all">{audioFile[0].name}</span>
+													<Button
+														variant="icon"
+														iconName="close"
+														ariaLabel="選択した音源を削除"
+														onClick={() => setAudioFile([])}
+													/>
+												</SpaceBetween>
+											</Container>
+										) : null}
+										{values.audio && !audioFile.length ? (
+											<Button
+												loading={isDeletingAudio}
+												disabled={isSubmitting || isDeletingAudio}
+												onClick={handleDeleteAudio}
+											>
+												音源を削除
+											</Button>
+										) : null}
+									</SpaceBetween>
+								</FormField>
 							</Container>
 							<Container header={<Header variant="h2">譜面</Header>}>
 								<SpaceBetween size="l">
@@ -361,6 +554,83 @@ export default function MusicForm({
 																}))
 															}
 														/>
+													</FormField>
+													<FormField
+														label="譜面ファイル"
+														errorText={assetErrors[`chart.${key}`]}
+													>
+														<SpaceBetween size="s">
+															{!chartFiles[key].length && !sheet.chart ? (
+																<FileUpload
+																	accept=".sus"
+																	value={chartFiles[key]}
+																	constraintText="SUS、最大 5 MiB"
+																	onChange={({ detail }) => {
+																		const file = detail.value[0];
+																		const field = `chart.${key}`;
+																		if (file && file.size > MAX_CHART_SIZE) {
+																			setChartFiles((current) => ({
+																				...current,
+																				[key]: [],
+																			}));
+																			setAssetError(
+																				field,
+																				`${label} の譜面ファイルは 5 MiB 以下にしてください。`,
+																			);
+																			return;
+																		}
+																		setChartFiles((current) => ({
+																			...current,
+																			[key]: detail.value,
+																		}));
+																		setAssetError(field);
+																	}}
+																	i18nStrings={{
+																		uploadButtonText: () => "譜面を選択",
+																		dropzoneText: () =>
+																			"SUS ファイルをここにドロップ",
+																		removeFileAriaLabel: () => "譜面を削除",
+																	}}
+																/>
+															) : null}
+															{chartFiles[key][0] ? (
+																<Container>
+																	<SpaceBetween
+																		direction="horizontal"
+																		size="s"
+																		alignItems="center"
+																	>
+																		<span className="break-all">
+																			{chartFiles[key][0].name}
+																		</span>
+																		<Button
+																			variant="icon"
+																			iconName="close"
+																			ariaLabel="選択した譜面を削除"
+																			onClick={() =>
+																				setChartFiles((current) => ({
+																					...current,
+																					[key]: [],
+																				}))
+																			}
+																		/>
+																	</SpaceBetween>
+																</Container>
+															) : null}
+															{sheet.chart &&
+															!chartFiles[key].length &&
+															data ? (
+																<Button
+																	loading={deletingChart === key}
+																	disabled={
+																		isSubmitting || deletingChart === key
+																	}
+																	onClick={() => handleDeleteChart(key)}
+																>
+																	譜面を削除
+																</Button>
+															) : null}
+														</SpaceBetween>
 													</FormField>
 													<FormField
 														label="譜面制作者"
