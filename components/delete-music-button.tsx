@@ -10,6 +10,16 @@ import { deleteMusicAction } from "@/app/musics/actions";
 
 const destructiveIconStyle = {
 	root: {
+		background: {
+			active: "#fff5f5",
+			default: "#ffffff",
+			hover: "#fff5f5",
+		},
+		borderColor: {
+			active: "#7d2100",
+			default: "#d13212",
+			hover: "#a91b0c",
+		},
 		color: {
 			active: "#7d2100",
 			default: "#d13212",
@@ -55,12 +65,14 @@ export default function DeleteMusicButton({ musicId }: { musicId: string }) {
 	return (
 		<>
 			<Button
-				ariaLabel="楽曲を削除"
+				ariaLabel="楽曲を削除する"
 				iconName="delete-marker"
 				style={destructiveIconStyle}
-				variant="icon"
+				variant="normal"
 				onClick={() => setVisible(true)}
-			/>
+			>
+				楽曲を削除する
+			</Button>
 			<Modal
 				visible={visible}
 				onDismiss={() => setVisible(false)}

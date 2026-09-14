@@ -380,7 +380,8 @@ export default function MusicForm({
 				<form onSubmit={handleSubmit}>
 					<Form
 						actions={
-							<SpaceBetween direction="horizontal" size="s" alignItems="center">
+							<div className="flex w-full flex-wrap items-center gap-4">
+								{data ? <DeleteMusicButton musicId={data.music.id} /> : null}
 								{saveProgress ? (
 									<div className="w-full min-w-0 flex-1">
 										<ProgressBar
@@ -391,17 +392,19 @@ export default function MusicForm({
 										/>
 									</div>
 								) : null}
-								<Button href={data ? `/musics/${data.music.id}` : "/musics"}>
-									キャンセル
-								</Button>
-								<Button
-									variant="primary"
-									loading={isSubmitting}
-									disabled={isSubmitting}
-								>
-									保存
-								</Button>
-							</SpaceBetween>
+								<div className="ml-auto flex items-center gap-3">
+									<Button href={data ? `/musics/${data.music.id}` : "/musics"}>
+										キャンセル
+									</Button>
+									<Button
+										variant="primary"
+										loading={isSubmitting}
+										disabled={isSubmitting}
+									>
+										保存
+									</Button>
+								</div>
+							</div>
 						}
 					>
 						<SpaceBetween size="l">
@@ -711,11 +714,6 @@ export default function MusicForm({
 									})}
 								</SpaceBetween>
 							</Container>
-							{data ? (
-								<div className="flex justify-end">
-									<DeleteMusicButton musicId={data.music.id} />
-								</div>
-							) : null}
 						</SpaceBetween>
 					</Form>
 				</form>
