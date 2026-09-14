@@ -380,6 +380,15 @@ export default function MusicForm({
 					<Form
 						actions={
 							<SpaceBetween direction="horizontal" size="s">
+								{saveProgress ? (
+									<div className="min-w-0 flex-1">
+										<ProgressBar
+											value={(saveProgress.current / saveProgress.total) * 100}
+											label={saveProgress.label}
+											description={`${saveProgress.current} / ${saveProgress.total}`}
+										/>
+									</div>
+								) : null}
 								<Button href={data ? `/musics/${data.music.id}` : "/musics"}>
 									キャンセル
 								</Button>
@@ -701,15 +710,6 @@ export default function MusicForm({
 								</SpaceBetween>
 							</Container>
 						</SpaceBetween>
-						{saveProgress ? (
-							<div className="mt-4">
-								<ProgressBar
-									value={(saveProgress.current / saveProgress.total) * 100}
-									label={saveProgress.label}
-									description={`${saveProgress.current} / ${saveProgress.total}`}
-								/>
-							</div>
-						) : null}
 					</Form>
 				</form>
 			</ContentLayout>
