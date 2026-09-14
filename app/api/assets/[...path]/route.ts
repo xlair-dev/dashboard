@@ -1,6 +1,6 @@
 import { auth0 } from "@/lib/auth0";
 
-const assetPathPattern = /^musics\/[^/]+\/(audio|chart)\/[^/]+$/;
+const assetPathPattern = /^(musics\/[^/]+\/audio|sheets\/[^/]+\/chart)\/[^/]+$/;
 
 export async function GET(
 	request: Request,
@@ -19,8 +19,9 @@ export async function GET(
 	}
 	if (!accessToken?.token) return new Response(null, { status: 401 });
 
+	const upstreamPath = `admin/${path}`;
 	const upstreamUrl = new URL(
-		path.split("/").map(encodeURIComponent).join("/"),
+		upstreamPath.split("/").map(encodeURIComponent).join("/"),
 		`${process.env.API_BASE_URL}/`,
 	);
 	const requestHeaders = new Headers({
