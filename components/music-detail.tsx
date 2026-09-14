@@ -9,7 +9,6 @@ import SpaceBetween from "@cloudscape-design/components/space-between";
 import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 import { AssetDisplay, chartAssetDisplay } from "@/components/asset-display";
-import AssetPreview from "@/components/asset-preview";
 import DashboardLayout from "@/components/dashboard-layout";
 import MusicBreadcrumbs from "@/components/music-breadcrumbs";
 import type { MusicWithSheets } from "@/lib/api";
@@ -94,16 +93,11 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 									updatedAt={music.jacket?.updatedAt ?? null}
 								/>
 								<div className="md:col-start-2">
-									<AssetPreview
-										type="audio"
-										url={music.audio?.url}
-										label="音源"
-									/>
 									<AssetDisplay
 										type="audio"
 										url={music.audio?.url ?? null}
 										updatedAt={music.audio?.updatedAt ?? null}
-										showLabel={false}
+										preview="audio"
 									/>
 								</div>
 								{data.sheets.map((sheet) => (
@@ -111,15 +105,9 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 										key={sheet.id}
 										className={difficultyColumns[sheet.difficulty]}
 									>
-										<AssetPreview
-											type="chart"
-											url={sheet.chart?.url}
-											label={difficultyLabels[sheet.difficulty]}
-										/>
 										{chartAssetDisplay(
 											sheet,
 											difficultyLabels[sheet.difficulty],
-											false,
 										)}
 									</div>
 								))}

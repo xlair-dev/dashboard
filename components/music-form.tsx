@@ -565,16 +565,11 @@ export default function MusicForm({
 										) : null}
 										{!audioFile.length && values.audio ? (
 											<SpaceBetween size="s">
-												<AssetPreview
-													type="audio"
-													url={values.audio}
-													label="音源"
-												/>
 												<AssetDisplay
 													type="audio"
 													url={values.audio}
 													updatedAt={data?.music.audio?.updatedAt ?? null}
-													showLabel={false}
+													preview="audio"
 												/>
 												<Button
 													loading={isDeletingAudio}
@@ -675,11 +670,6 @@ export default function MusicForm({
 															) : null}
 															{!chartFiles[key].length && sheet.chart ? (
 																<SpaceBetween size="s">
-																	<AssetPreview
-																		type="chart"
-																		url={sheet.chart}
-																		label={label}
-																	/>
 																	<AssetDisplay
 																		type="chart"
 																		url={sheet.chart}
@@ -689,7 +679,7 @@ export default function MusicForm({
 																			)?.chart?.updatedAt ?? null
 																		}
 																		label={label}
-																		showLabel={false}
+																		preview="chart"
 																	/>
 																	<Button
 																		loading={deletingChart === key}

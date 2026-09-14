@@ -2,6 +2,7 @@ import Button from "@cloudscape-design/components/button";
 import Icon from "@cloudscape-design/components/icon";
 import Image from "next/image";
 
+import AssetPreview from "@/components/asset-preview";
 import type { Sheet } from "@/lib/api";
 
 type AssetType = "jacket" | "audio" | "chart";
@@ -11,7 +12,7 @@ type AssetDisplayProps = {
 	url: string | null;
 	updatedAt: string | null;
 	label?: string;
-	showLabel?: boolean;
+	preview?: "audio" | "chart";
 };
 
 const assetLabels: Record<AssetType, string> = {
@@ -31,7 +32,7 @@ export function AssetDisplay({
 	url,
 	updatedAt,
 	label,
-	showLabel = true,
+	preview,
 }: AssetDisplayProps) {
 	const hasAsset = Boolean(url);
 	const displayLabel = label ?? assetLabels[type];
@@ -59,7 +60,13 @@ export function AssetDisplay({
 				)}
 			</div>
 			<div className="min-w-0">
-				{showLabel ? <div className="truncate">{displayLabel}</div> : null}
+				<div className="truncate">
+					{preview && hasAsset ? (
+						<AssetPreview type={preview} url={url} label={displayLabel} />
+					) : (
+						displayLabel
+					)}
+				</div>
 				<div className="text-sm text-slate-600">
 					{hasAsset ? formatUpdatedAt(updatedAt) : "なし"}
 				</div>
@@ -68,18 +75,14 @@ export function AssetDisplay({
 	);
 }
 
-export function chartAssetDisplay(
-	sheet: Sheet,
-	label?: string,
-	showLabel = true,
-) {
+export function chartAssetDisplay(sheet: Sheet, label?: string) {
 	return (
 		<AssetDisplay
 			type="chart"
 			url={sheet.chart?.url ?? null}
 			updatedAt={sheet.chart?.updatedAt ?? null}
 			label={label}
-			showLabel={showLabel}
+			preview="chart"
 		/>
 	);
 }
