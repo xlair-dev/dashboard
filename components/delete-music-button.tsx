@@ -44,7 +44,13 @@ const destructiveActionStyle = {
 	},
 };
 
-export default function DeleteMusicButton({ musicId }: { musicId: string }) {
+export default function DeleteMusicButton({
+	musicId,
+	disabled = false,
+}: {
+	musicId: string;
+	disabled?: boolean;
+}) {
 	const router = useRouter();
 	const [visible, setVisible] = useState(false);
 	const [error, setError] = useState<string>();
@@ -69,6 +75,7 @@ export default function DeleteMusicButton({ musicId }: { musicId: string }) {
 				iconName="delete-marker"
 				style={destructiveIconStyle}
 				variant="normal"
+				disabled={disabled || isPending}
 				onClick={(event) => {
 					event.preventDefault();
 					setVisible(true);

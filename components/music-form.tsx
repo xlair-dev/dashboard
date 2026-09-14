@@ -380,7 +380,12 @@ export default function MusicForm({
 				<form onSubmit={handleSubmit}>
 					<Form
 						secondaryActions={
-							data ? <DeleteMusicButton musicId={data.music.id} /> : null
+							data ? (
+								<DeleteMusicButton
+									musicId={data.music.id}
+									disabled={isSubmitting}
+								/>
+							) : null
 						}
 						actions={
 							<div className="flex flex-wrap items-center gap-4">
@@ -395,7 +400,10 @@ export default function MusicForm({
 									</div>
 								) : null}
 								<div className="ml-auto flex items-center gap-3">
-									<Button href={data ? `/musics/${data.music.id}` : "/musics"}>
+									<Button
+										href={data ? `/musics/${data.music.id}` : "/musics"}
+										disabled={isSubmitting}
+									>
 										キャンセル
 									</Button>
 									<Button
