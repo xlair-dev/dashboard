@@ -367,15 +367,6 @@ export default function MusicForm({
 					/>
 				</div>
 			) : null}
-			{saveProgress ? (
-				<div className="mb-4">
-					<ProgressBar
-						value={(saveProgress.current / saveProgress.total) * 100}
-						label={saveProgress.label}
-						description={`${saveProgress.current} / ${saveProgress.total}`}
-					/>
-				</div>
-			) : null}
 			<ContentLayout
 				breadcrumbs={
 					<MusicBreadcrumbs
@@ -388,7 +379,17 @@ export default function MusicForm({
 				<form onSubmit={handleSubmit}>
 					<Form
 						actions={
-							<SpaceBetween direction="horizontal" size="s">
+							<SpaceBetween direction="horizontal" size="s" alignItems="center">
+								{saveProgress ? (
+									<div className="w-full min-w-0 flex-1">
+										<ProgressBar
+											className="w-full"
+											value={(saveProgress.current / saveProgress.total) * 100}
+											label={saveProgress.label}
+											description={`${saveProgress.current} / ${saveProgress.total}`}
+										/>
+									</div>
+								) : null}
 								<Button href={data ? `/musics/${data.music.id}` : "/musics"}>
 									キャンセル
 								</Button>
@@ -552,6 +553,8 @@ export default function MusicForm({
 											<PendingAssetDisplay
 												type="audio"
 												fileName={audioFile[0].name}
+												file={audioFile[0]}
+												previewType="audio"
 												onRemove={() => setAudioFile([])}
 											/>
 										) : null}
@@ -561,6 +564,7 @@ export default function MusicForm({
 													type="audio"
 													url={values.audio}
 													updatedAt={data?.music.audio?.updatedAt ?? null}
+													preview="audio"
 												/>
 												<Button
 													loading={isDeletingAudio}
@@ -644,6 +648,8 @@ export default function MusicForm({
 																<PendingAssetDisplay
 																	type="chart"
 																	fileName={chartFiles[key][0].name}
+																	file={chartFiles[key][0]}
+																	previewType="chart"
 																	onRemove={() =>
 																		setChartFiles((current) => ({
 																			...current,
@@ -662,7 +668,8 @@ export default function MusicForm({
 																				(item) => item.difficulty === key,
 																			)?.chart?.updatedAt ?? null
 																		}
-																		label={label}
+																		label={`${label} 譜面`}
+																		preview="chart"
 																	/>
 																	<Button
 																		loading={deletingChart === key}

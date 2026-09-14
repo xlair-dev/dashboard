@@ -2,6 +2,7 @@ import Button from "@cloudscape-design/components/button";
 import Icon from "@cloudscape-design/components/icon";
 import Image from "next/image";
 
+import AssetPreview from "@/components/asset-preview";
 import type { Sheet } from "@/lib/api";
 
 type AssetType = "jacket" | "audio" | "chart";
@@ -11,6 +12,7 @@ type AssetDisplayProps = {
 	url: string | null;
 	updatedAt: string | null;
 	label?: string;
+	preview?: "audio" | "chart";
 };
 
 const assetLabels: Record<AssetType, string> = {
@@ -30,6 +32,7 @@ export function AssetDisplay({
 	url,
 	updatedAt,
 	label,
+	preview,
 }: AssetDisplayProps) {
 	const hasAsset = Boolean(url);
 	const displayLabel = label ?? assetLabels[type];
@@ -57,7 +60,13 @@ export function AssetDisplay({
 				)}
 			</div>
 			<div className="min-w-0">
-				<div className="truncate">{displayLabel}</div>
+				<div className="truncate">
+					{preview && hasAsset ? (
+						<AssetPreview type={preview} url={url} label={displayLabel} />
+					) : (
+						displayLabel
+					)}
+				</div>
 				<div className="text-sm text-slate-600">
 					{hasAsset ? formatUpdatedAt(updatedAt) : "なし"}
 				</div>
@@ -73,6 +82,7 @@ export function chartAssetDisplay(sheet: Sheet, label?: string) {
 			url={sheet.chart?.url ?? null}
 			updatedAt={sheet.chart?.updatedAt ?? null}
 			label={label}
+			preview="chart"
 		/>
 	);
 }
@@ -81,11 +91,15 @@ export function PendingAssetDisplay({
 	type,
 	fileName,
 	previewUrl,
+	file,
+	previewType,
 	onRemove,
 }: {
 	type: AssetType;
 	fileName: string;
 	previewUrl?: string;
+	file?: File;
+	previewType?: "audio" | "chart";
 	onRemove: () => void;
 }) {
 	const label = assetLabels[type];
@@ -111,7 +125,11 @@ export function PendingAssetDisplay({
 							/>
 						)}
 					</div>
-					<span className="min-w-0 break-all">{fileName}</span>
+					{file && previewType ? (
+						<AssetPreview type={previewType} file={file} label={fileName} />
+					) : (
+						<span className="min-w-0 break-all">{fileName}</span>
+					)}
 				</div>
 				<Button
 					variant="icon"
