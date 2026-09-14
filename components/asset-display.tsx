@@ -52,17 +52,17 @@ export function AssetDisplay({
 				) : (
 					<Icon
 						name={type === "audio" ? "audio-full" : "file"}
-						variant={hasAsset ? "normal" : "disabled"}
-						className={hasAsset ? "text-cyan-500" : "text-slate-400"}
+						variant="normal"
+						className="text-cyan-500"
 						ariaLabel={displayLabel}
 					/>
 				)}
 			</div>
 			<div className="min-w-0">
-				<div className="truncate">{hasAsset ? displayLabel : "なし"}</div>
-				{hasAsset && showUpdatedAt && (
+				<div className="truncate">{displayLabel}</div>
+				{showUpdatedAt && (
 					<div className="text-sm text-slate-600">
-						{formatUpdatedAt(updatedAt)}
+						{hasAsset ? formatUpdatedAt(updatedAt) : "なし"}
 					</div>
 				)}
 			</div>
