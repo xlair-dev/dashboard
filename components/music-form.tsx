@@ -70,8 +70,8 @@ const genres: Array<{ value: Genre; label: string }> = [
 	{ value: "OTHER", label: "OTHER" },
 ];
 
-const MAX_JACKET_SIZE = 5 * 1024 * 1024;
-const MAX_AUDIO_SIZE = 30 * 1024 * 1024;
+const MAX_JACKET_SIZE = 20 * 1024 * 1024;
+const MAX_AUDIO_SIZE = 60 * 1024 * 1024;
 const MAX_CHART_SIZE = 5 * 1024 * 1024;
 
 function isPositiveSingleDecimal(value: string) {
@@ -487,14 +487,14 @@ export default function MusicForm({
 											<FileUpload
 												accept="image/jpeg,image/png,image/webp"
 												value={jacketFile}
-												constraintText="最大 5 MiB"
+												constraintText="最大 20 MiB"
 												onChange={({ detail }) => {
 													const file = detail.value[0];
 													if (file && file.size > MAX_JACKET_SIZE) {
 														setJacketFile([]);
 														setAssetError(
 															"jacket",
-															"ジャケットは 5 MiB 以下にしてください。",
+															"ジャケットは 20 MiB 以下にしてください。",
 														);
 														return;
 													}
@@ -542,14 +542,14 @@ export default function MusicForm({
 											<FileUpload
 												accept="audio/wav"
 												value={audioFile}
-												constraintText="WAV、最大 30 MiB"
+												constraintText="WAV、最大 60 MiB"
 												onChange={({ detail }) => {
 													const file = detail.value[0];
 													if (file && file.size > MAX_AUDIO_SIZE) {
 														setAudioFile([]);
 														setAssetError(
 															"audio",
-															"音源は 30 MiB 以下にしてください。",
+															"音源は 60 MiB 以下にしてください。",
 														);
 														return;
 													}
