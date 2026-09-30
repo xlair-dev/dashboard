@@ -12,7 +12,9 @@ type AssetDisplayProps = {
 	url: string | null;
 	updatedAt: string | null;
 	label?: string;
-	preview?: "audio" | "chart";
+	preview?: "audio" | "chart" | "jacket";
+	/** Base file name; the asset extension is added by the download route. */
+	downloadName?: string;
 };
 
 const assetLabels: Record<AssetType, string> = {
@@ -33,9 +35,15 @@ export function AssetDisplay({
 	updatedAt,
 	label,
 	preview,
+	downloadName,
 }: AssetDisplayProps) {
 	const hasAsset = Boolean(url);
 	const displayLabel = label ?? assetLabels[type];
+	const downloadQuery = new URLSearchParams({ download: "1" });
+	if (downloadName) downloadQuery.set("filename", downloadName);
+	const downloadUrl = url
+		? `/api/assets${new URL(url).pathname}?${downloadQuery}`
+		: null;
 
 	return (
 		<div className="flex min-h-12 items-center gap-3">
@@ -62,7 +70,12 @@ export function AssetDisplay({
 			<div className="min-w-0">
 				<div className="truncate">
 					{preview && hasAsset ? (
-						<AssetPreview type={preview} url={url} label={displayLabel} />
+						<AssetPreview
+							type={preview}
+							url={url}
+							label={displayLabel}
+							downloadUrl={downloadUrl ?? undefined}
+						/>
 					) : (
 						displayLabel
 					)}
@@ -75,13 +88,18 @@ export function AssetDisplay({
 	);
 }
 
-export function chartAssetDisplay(sheet: Sheet, label?: string) {
+export function chartAssetDisplay(
+	sheet: Sheet,
+	label?: string,
+	downloadName?: string,
+) {
 	return (
 		<AssetDisplay
 			type="chart"
 			url={sheet.chart?.url ?? null}
 			updatedAt={sheet.chart?.updatedAt ?? null}
 			label={label}
+			downloadName={downloadName}
 			preview="chart"
 		/>
 	);
@@ -99,7 +117,7 @@ export function PendingAssetDisplay({
 	fileName: string;
 	previewUrl?: string;
 	file?: File;
-	previewType?: "audio" | "chart";
+	previewType?: "audio" | "chart" | "jacket";
 	onRemove: () => void;
 }) {
 	const label = assetLabels[type];

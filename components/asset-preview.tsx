@@ -1,11 +1,13 @@
 "use client";
 
+import Button from "@cloudscape-design/components/button";
 import Link from "@cloudscape-design/components/link";
 import Modal from "@cloudscape-design/components/modal";
 import SpaceBetween from "@cloudscape-design/components/space-between";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-type PreviewType = "audio" | "chart";
+type PreviewType = "audio" | "chart" | "jacket";
 
 function proxyUrl(url: string) {
 	const path = new URL(url, window.location.origin).pathname;
@@ -17,11 +19,13 @@ export default function AssetPreview({
 	url,
 	file,
 	label,
+	downloadUrl,
 }: {
 	type: PreviewType;
 	url?: string | null;
 	file?: File;
 	label: string;
+	downloadUrl?: string;
 }) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [source, setSource] = useState<string>();
@@ -80,6 +84,13 @@ export default function AssetPreview({
 				header={`${label}プレビュー`}
 				closeAriaLabel="プレビューを閉じる"
 				size="large"
+				footer={
+					downloadUrl ? (
+						<Button href={downloadUrl} iconName="download">
+							ダウンロード
+						</Button>
+					) : null
+				}
 			>
 				<SpaceBetween size="s">
 					{/* Audio previews contain no spoken content requiring captions. */}
@@ -89,6 +100,18 @@ export default function AssetPreview({
 							{/* biome-ignore lint/a11y/useMediaCaption: The preview is instrumental audio. */}
 							<audio ref={audioRef} controls src={source} />
 						</>
+					) : null}
+					{type === "jacket" ? (
+						<div className="relative h-[min(70vh,48rem)] w-full">
+							<Image
+								src={source}
+								alt={`${label}プレビュー`}
+								fill
+								sizes="(max-width: 820px) 100vw, 780px"
+								className="object-contain"
+								unoptimized
+							/>
+						</div>
 					) : null}
 					{type === "chart" && error ? <p>{error}</p> : null}
 					{type === "chart" && !error && !svg ? (
