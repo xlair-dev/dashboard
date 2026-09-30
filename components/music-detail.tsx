@@ -91,12 +91,15 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 									type="jacket"
 									url={music.jacket?.url ?? null}
 									updatedAt={music.jacket?.updatedAt ?? null}
+									downloadName={`${music.title}-jacket`}
+									preview="jacket"
 								/>
 								<div className="md:col-start-2">
 									<AssetDisplay
 										type="audio"
 										url={music.audio?.url ?? null}
 										updatedAt={music.audio?.updatedAt ?? null}
+										downloadName={`${music.title}-audio`}
 										preview="audio"
 									/>
 								</div>
@@ -108,6 +111,7 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 										{chartAssetDisplay(
 											sheet,
 											`${difficultyLabels[sheet.difficulty]} 譜面`,
+											`${music.title}-chart-${sheet.difficulty}`,
 										)}
 									</div>
 								))}

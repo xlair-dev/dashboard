@@ -514,6 +514,8 @@ export default function MusicForm({
 													type="jacket"
 													fileName={jacketFile[0].name}
 													previewUrl={jacketPreviewUrl}
+													file={jacketFile[0]}
+													previewType="jacket"
 													onRemove={() => setJacketFile([])}
 												/>
 											</SpaceBetween>
@@ -524,6 +526,8 @@ export default function MusicForm({
 													type="jacket"
 													url={values.jacket}
 													updatedAt={data?.music.jacket?.updatedAt ?? null}
+													downloadName={`${values.title}-jacket`}
+													preview="jacket"
 												/>
 												<Button
 													loading={isDeletingJacket}
@@ -578,6 +582,7 @@ export default function MusicForm({
 													type="audio"
 													url={values.audio}
 													updatedAt={data?.music.audio?.updatedAt ?? null}
+													downloadName={`${values.title}-audio`}
 													preview="audio"
 												/>
 												<Button
@@ -677,6 +682,7 @@ export default function MusicForm({
 																	<AssetDisplay
 																		type="chart"
 																		url={sheet.chart}
+																		downloadName={`${values.title}-chart-${key}`}
 																		updatedAt={
 																			data?.sheets.find(
 																				(item) => item.difficulty === key,
