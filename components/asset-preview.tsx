@@ -106,7 +106,9 @@ export default function AssetPreview({
 					setError(
 						cause instanceof Error
 							? cause.message
-							: "譜面を表示できませんでした。",
+							: typeof cause === "string"
+								? cause
+								: "譜面を表示できませんでした。",
 					);
 			}
 		})();
