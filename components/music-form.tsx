@@ -72,7 +72,7 @@ const genres: Array<{ value: Genre; label: string }> = [
 
 const MAX_JACKET_SIZE = 20 * 1024 * 1024;
 const MAX_AUDIO_SIZE = 60 * 1024 * 1024;
-const MAX_CHART_SIZE = 5 * 1024 * 1024;
+const MAX_CHART_SIZE = 20 * 1024 * 1024;
 
 function isPositiveSingleDecimal(value: string) {
 	return /^\d+(\.\d)?$/.test(value) && Number(value) > 0;
@@ -633,7 +633,7 @@ export default function MusicForm({
 															{!chartFiles[key].length && !sheet.chart ? (
 																<FileUpload
 																	value={chartFiles[key]}
-																	constraintText="最大 5 MiB"
+																	constraintText="最大 20 MiB"
 																	onChange={({ detail }) => {
 																		const file = detail.value[0];
 																		const field = `chart.${key}`;
@@ -644,7 +644,7 @@ export default function MusicForm({
 																			}));
 																			setAssetError(
 																				field,
-																				`${label} の譜面ファイルは 5 MiB 以下にしてください。`,
+																				`${label} の譜面ファイルは 20 MiB 以下にしてください。`,
 																			);
 																			return;
 																		}
