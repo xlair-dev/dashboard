@@ -627,9 +627,8 @@ export default function MusicForm({
 														<SpaceBetween size="s">
 															{!chartFiles[key].length && !sheet.chart ? (
 																<FileUpload
-																	accept=".sus"
 																	value={chartFiles[key]}
-																	constraintText="SUS、最大 5 MiB"
+																	constraintText="最大 5 MiB"
 																	onChange={({ detail }) => {
 																		const file = detail.value[0];
 																		const field = `chart.${key}`;
@@ -653,7 +652,7 @@ export default function MusicForm({
 																	i18nStrings={{
 																		uploadButtonText: () => "譜面を選択",
 																		dropzoneText: () =>
-																			"SUS ファイルをここにドロップ",
+																			"譜面ファイルをここにドロップ",
 																		removeFileAriaLabel: () => "譜面を削除",
 																	}}
 																/>

@@ -215,7 +215,6 @@ export async function uploadChart(
 	returnTo: string,
 ): Promise<MusicWithSheets> {
 	const accessToken = await getAccessToken(returnTo);
-	const fileName = chart.name.replace(/["\\\r\n]/g, "_");
 	const response = await fetch(
 		`${process.env.API_BASE_URL}/admin/sheets/${encodeURIComponent(sheetId)}/chart`,
 		{
@@ -223,7 +222,6 @@ export async function uploadChart(
 			headers: {
 				Authorization: `Bearer ${accessToken.token}`,
 				"Content-Type": "application/octet-stream",
-				"Content-Disposition": `attachment; filename="${fileName}"`,
 			},
 			body: chart,
 			cache: "no-store",
