@@ -179,7 +179,7 @@ export default function AssetPreview({
 						<p>譜面を読み込み中...</p>
 					) : null}
 					{type === "chart" && chart ? (
-						<>
+						<div className="flex flex-col gap-3">
 							<div className="flex items-center gap-2">
 								<span>表示</span>
 								<Select
@@ -228,7 +228,7 @@ export default function AssetPreview({
 							{audioSource && !supportsChartTiming(chart) ? (
 								<p>この譜面には音源と同期するための BPM 情報がありません。</p>
 							) : null}
-						</>
+						</div>
 					) : null}
 				</SpaceBetween>
 			</Modal>
