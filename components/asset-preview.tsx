@@ -8,7 +8,6 @@ import SpaceBetween from "@cloudscape-design/components/space-between";
 import {
 	audioSecondsAtBeat,
 	type ChartData,
-	type ChartFormat,
 	ChartViewer,
 	type ChartViewMode,
 	chartEndBeat,
@@ -18,23 +17,13 @@ import {
 } from "@xlair-dev/chart-viewer";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { chartFormat } from "@/lib/chart-format";
 
 type PreviewType = "audio" | "chart" | "jacket";
 
 function proxyUrl(url: string) {
 	const path = new URL(url, window.location.origin).pathname;
 	return `/api/assets${path}`;
-}
-
-function chartFormat(source: string): ChartFormat {
-	const extension = new URL(source, window.location.origin).pathname
-		.split(".")
-		.at(-1)
-		?.toLowerCase();
-	if (extension === "c2s" || extension === "sus" || extension === "ugc") {
-		return extension;
-	}
-	throw new Error("C2S、SUS、UGC 形式の譜面を表示できます。");
 }
 
 export default function AssetPreview({
@@ -98,9 +87,7 @@ export default function AssetPreview({
 				if (!response.ok)
 					throw new Error("譜面ファイルを取得できませんでした。");
 				const bytes = new Uint8Array(await response.arrayBuffer());
-				setChart(
-					await parseChartBytes(bytes, chartFormat(file?.name ?? source)),
-				);
+				setChart(await parseChartBytes(bytes, chartFormat(bytes)));
 			} catch (cause) {
 				if (!controller.signal.aborted)
 					setError(
@@ -113,7 +100,7 @@ export default function AssetPreview({
 			}
 		})();
 		return () => controller.abort();
-	}, [file?.name, isOpen, source, type]);
+	}, [isOpen, source, type]);
 
 	const syncPosition = useCallback(() => {
 		const audio = audioRef.current;
