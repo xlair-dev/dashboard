@@ -175,6 +175,9 @@ importers:
       '@cloudscape-design/global-styles':
         specifier: ^1.0.0
         version: 1.0.71
+      '@xlair-dev/chart-viewer':
+        specifier: github:xlair-dev/chart-viewer#e76e42651f234905fbeb933cfbd4743f77476e2b
+        version: https://codeload.github.com/xlair-dev/chart-viewer/tar.gz/e76e42651f234905fbeb933cfbd4743f77476e2b(react@19.3.1)
       next:
         specifier: 16.4.1
         version: 16.4.1(@types/node@26.6.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -941,6 +944,12 @@ packages:
 
   '@vitest/spy@5.0.5':
     resolution: {integrity: sha512-lwJRExuH417257Q5wv9QYugN9IMJkoxcrKrYxGPQkBzl7wlNpTUxD/5yNX4ESKVUIShKPgkGchYPFMWOOk0wzw==}
+
+  '@xlair-dev/chart-viewer@https://codeload.github.com/xlair-dev/chart-viewer/tar.gz/e76e42651f234905fbeb933cfbd4743f77476e2b':
+    resolution: {gitHosted: true, integrity: sha512-1igSvyGXLSDGhnc3m0f9YfFuDCbOxzfxn9UpgHPddCGsxP2asFNgHAMku5O658BXvV8dBXJjcawEpi2dpRxMwg==, tarball: https://codeload.github.com/xlair-dev/chart-viewer/tar.gz/e76e42651f234905fbeb933cfbd4743f77476e2b}
+    version: 0.1.0
+    peerDependencies:
+      react: ^19.0.0
 
   ace-builds@1.44.0:
     resolution: {integrity: sha512-PFNMSYqFdEUkul2Ntud0HvA09AgY+F1ag0UYdpMH60wNI/qOA8cB8tlTgoALMEwIdUPJK2CjrIQ7OnbiSS/ugQ==}
@@ -1997,6 +2006,10 @@ snapshots:
       vite: 8.3.4(@types/node@26.6.5)(jiti@2.7.0)
 
   '@vitest/spy@5.0.5': {}
+
+  '@xlair-dev/chart-viewer@https://codeload.github.com/xlair-dev/chart-viewer/tar.gz/e76e42651f234905fbeb933cfbd4743f77476e2b(react@19.3.1)':
+    dependencies:
+      react: 19.3.1
 
   ace-builds@1.44.0: {}
 

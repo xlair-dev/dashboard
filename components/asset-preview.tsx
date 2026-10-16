@@ -3,9 +3,21 @@
 import Button from "@cloudscape-design/components/button";
 import Link from "@cloudscape-design/components/link";
 import Modal from "@cloudscape-design/components/modal";
+import Select from "@cloudscape-design/components/select";
 import SpaceBetween from "@cloudscape-design/components/space-between";
+import {
+	audioSecondsAtBeat,
+	type ChartData,
+	ChartViewer,
+	type ChartViewMode,
+	chartEndBeat,
+	parseChartBytes,
+	positionAtAudioSeconds,
+	supportsChartTiming,
+} from "@xlair-dev/chart-viewer";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { chartFormat } from "@/lib/chart-format";
 
 type PreviewType = "audio" | "chart" | "jacket";
 
@@ -20,16 +32,21 @@ export default function AssetPreview({
 	file,
 	label,
 	downloadUrl,
+	companionAudio,
 }: {
 	type: PreviewType;
 	url?: string | null;
 	file?: File;
 	label: string;
 	downloadUrl?: string;
+	companionAudio?: { url?: string | null; file?: File };
 }) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [source, setSource] = useState<string>();
-	const [svg, setSvg] = useState<string>();
+	const [audioSource, setAudioSource] = useState<string>();
+	const [chart, setChart] = useState<ChartData>();
+	const [position, setPosition] = useState(0);
+	const [mode, setMode] = useState<ChartViewMode>("both");
 	const [error, setError] = useState<string>();
 	const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -43,6 +60,18 @@ export default function AssetPreview({
 	}, [file, url]);
 
 	useEffect(() => {
+		const audioFile = companionAudio?.file;
+		if (audioFile) {
+			const objectUrl = URL.createObjectURL(audioFile);
+			setAudioSource(objectUrl);
+			return () => URL.revokeObjectURL(objectUrl);
+		}
+		setAudioSource(
+			companionAudio?.url ? proxyUrl(companionAudio.url) : undefined,
+		);
+	}, [companionAudio?.file, companionAudio?.url]);
+
+	useEffect(() => {
 		if (!isOpen) audioRef.current?.pause();
 	}, [isOpen]);
 
@@ -50,27 +79,55 @@ export default function AssetPreview({
 		if (!isOpen || type !== "chart" || !source) return;
 		const controller = new AbortController();
 		setError(undefined);
-		setSvg(undefined);
+		setChart(undefined);
+		setPosition(0);
 		(async () => {
 			try {
 				const response = await fetch(source, { signal: controller.signal });
 				if (!response.ok)
 					throw new Error("譜面ファイルを取得できませんでした。");
-				const content = await response.text();
-				const wasm = await import("@/lib/pjsekai-scores/pjsekai_scores_rs.js");
-				await wasm.default();
-				setSvg(wasm.Score.load(content).svg());
+				const bytes = new Uint8Array(await response.arrayBuffer());
+				setChart(await parseChartBytes(bytes, chartFormat(bytes)));
 			} catch (cause) {
 				if (!controller.signal.aborted)
 					setError(
 						cause instanceof Error
 							? cause.message
-							: "譜面を表示できませんでした。",
+							: typeof cause === "string"
+								? cause
+								: "譜面を表示できませんでした。",
 					);
 			}
 		})();
 		return () => controller.abort();
 	}, [isOpen, source, type]);
+
+	const syncPosition = useCallback(() => {
+		const audio = audioRef.current;
+		if (chart && audio && supportsChartTiming(chart)) {
+			setPosition(positionAtAudioSeconds(chart, audio.currentTime));
+		}
+	}, [chart]);
+
+	useEffect(() => {
+		const audio = audioRef.current;
+		if (!isOpen || type !== "chart" || !chart || !audio || audio.paused) return;
+		let frame = 0;
+		const update = () => {
+			syncPosition();
+			frame = requestAnimationFrame(update);
+		};
+		frame = requestAnimationFrame(update);
+		return () => cancelAnimationFrame(frame);
+	}, [chart, isOpen, syncPosition, type]);
+
+	const seek = (beat: number) => {
+		setPosition(beat);
+		const audio = audioRef.current;
+		if (chart && audio && supportsChartTiming(chart)) {
+			audio.currentTime = audioSecondsAtBeat(chart, beat);
+		}
+	};
 
 	if (!source) return null;
 	return (
@@ -93,12 +150,16 @@ export default function AssetPreview({
 				}
 			>
 				<SpaceBetween size="s">
-					{/* Audio previews contain no spoken content requiring captions. */}
-					{type === "audio" ? (
+					{type === "audio" || (type === "chart" && audioSource) ? (
 						<>
-							{/* Audio previews contain no spoken content requiring captions. */}
 							{/* biome-ignore lint/a11y/useMediaCaption: The preview is instrumental audio. */}
-							<audio ref={audioRef} controls src={source} />
+							<audio
+								ref={audioRef}
+								controls
+								src={type === "audio" ? source : audioSource}
+								onTimeUpdate={syncPosition}
+								onSeeked={syncPosition}
+							/>
 						</>
 					) : null}
 					{type === "jacket" ? (
@@ -114,16 +175,60 @@ export default function AssetPreview({
 						</div>
 					) : null}
 					{type === "chart" && error ? <p>{error}</p> : null}
-					{type === "chart" && !error && !svg ? (
+					{type === "chart" && !error && !chart ? (
 						<p>譜面を読み込み中...</p>
 					) : null}
-					{type === "chart" && svg ? (
-						<iframe
-							title="譜面プレビュー"
-							sandbox=""
-							srcDoc={svg}
-							className="h-[32rem] w-full border-0"
-						/>
+					{type === "chart" && chart ? (
+						<div className="flex flex-col gap-3">
+							<div className="flex items-center gap-2">
+								<span>表示</span>
+								<Select
+									ariaLabel="表示"
+									selectedOption={{
+										label:
+											mode === "sheet"
+												? "譜面"
+												: mode === "playfield"
+													? "ゲーム画面"
+													: "両方",
+										value: mode,
+									}}
+									options={[
+										{ label: "譜面", value: "sheet" },
+										{ label: "ゲーム画面", value: "playfield" },
+										{ label: "両方", value: "both" },
+									]}
+									onChange={({ detail }) =>
+										setMode(detail.selectedOption.value as ChartViewMode)
+									}
+								/>
+							</div>
+							<ChartViewer
+								chart={chart}
+								mode={mode}
+								position={position}
+								onPositionChange={seek}
+								showSeekBar={false}
+							/>
+							<label className="flex items-center gap-3">
+								<span className="whitespace-nowrap">
+									{position.toFixed(2)} 拍
+								</span>
+								<input
+									aria-label="譜面の再生位置"
+									className="w-full"
+									type="range"
+									min={0}
+									max={chartEndBeat(chart)}
+									step={0.01}
+									value={Math.min(position, chartEndBeat(chart))}
+									onChange={(event) => seek(Number(event.target.value))}
+								/>
+							</label>
+							{audioSource && !supportsChartTiming(chart) ? (
+								<p>この譜面には音源と同期するための BPM 情報がありません。</p>
+							) : null}
+						</div>
 					) : null}
 				</SpaceBetween>
 			</Modal>
