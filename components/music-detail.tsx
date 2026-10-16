@@ -112,6 +112,7 @@ export default function MusicDetail({ data }: { data: MusicWithSheets }) {
 											sheet,
 											`${difficultyLabels[sheet.difficulty]} 譜面`,
 											`${music.title}-chart-${sheet.difficulty}`,
+											music.audio?.url ? { url: music.audio.url } : undefined,
 										)}
 									</div>
 								))}

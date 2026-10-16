@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 import "@cloudscape-design/global-styles/index.css";
+import "@xlair-dev/chart-viewer/style.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
