@@ -176,8 +176,8 @@ importers:
         specifier: ^1.0.0
         version: 1.0.71
       '@xlair-dev/chart-viewer':
-        specifier: github:xlair-dev/chart-viewer#6b87ac0280ed5c29ae029da316d078b3b28f464b
-        version: https://codeload.github.com/xlair-dev/chart-viewer/tar.gz/6b87ac0280ed5c29ae029da316d078b3b28f464b(react@19.3.1)
+        specifier: github:xlair-dev/chart-viewer#a951d4b53ede689ee5a9a82ce853fc282da15d57
+        version: https://codeload.github.com/xlair-dev/chart-viewer/tar.gz/a951d4b53ede689ee5a9a82ce853fc282da15d57(react@19.3.1)
       next:
         specifier: 16.4.1
         version: 16.4.1(@types/node@26.6.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -945,8 +945,8 @@ packages:
   '@vitest/spy@5.0.5':
     resolution: {integrity: sha512-lwJRExuH417257Q5wv9QYugN9IMJkoxcrKrYxGPQkBzl7wlNpTUxD/5yNX4ESKVUIShKPgkGchYPFMWOOk0wzw==}
 
-  '@xlair-dev/chart-viewer@https://codeload.github.com/xlair-dev/chart-viewer/tar.gz/6b87ac0280ed5c29ae029da316d078b3b28f464b':
-    resolution: {gitHosted: true, integrity: sha512-TxFSXtzw9ZBoSqBNkIyqx2H/wYV/g0LxhsK4hXaYydiClaFtjmcDvwmJznAQD9ViqV0fNRDoSsQXZT+YKt509Q==, tarball: https://codeload.github.com/xlair-dev/chart-viewer/tar.gz/6b87ac0280ed5c29ae029da316d078b3b28f464b}
+  '@xlair-dev/chart-viewer@https://codeload.github.com/xlair-dev/chart-viewer/tar.gz/a951d4b53ede689ee5a9a82ce853fc282da15d57':
+    resolution: {gitHosted: true, integrity: sha512-yhC51lE9tNL0hJ1WOALaZpohbYjjgV5ldUIgAsgX1nd6Cg1of94X/xDLyT0JEARPZpMREvmvajpkuddQijKMzw==, tarball: https://codeload.github.com/xlair-dev/chart-viewer/tar.gz/a951d4b53ede689ee5a9a82ce853fc282da15d57}
     version: 0.1.0
     peerDependencies:
       react: ^19.0.0
@@ -2007,7 +2007,7 @@ snapshots:
 
   '@vitest/spy@5.0.5': {}
 
-  '@xlair-dev/chart-viewer@https://codeload.github.com/xlair-dev/chart-viewer/tar.gz/6b87ac0280ed5c29ae029da316d078b3b28f464b(react@19.3.1)':
+  '@xlair-dev/chart-viewer@https://codeload.github.com/xlair-dev/chart-viewer/tar.gz/a951d4b53ede689ee5a9a82ce853fc282da15d57(react@19.3.1)':
     dependencies:
       react: 19.3.1
 
