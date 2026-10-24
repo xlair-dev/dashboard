@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/xlair-dev/dashboard:latest@sha256:d286154a5dad757db69b95142f21ef94ca9f18dc9edd17aac93d1580e4990d71
+    image: ghcr.io/xlair-dev/dashboard:latest@sha256:d221ad070564a6b015895da80f97e595ad6bdd1cd04815047aadf61f946944f5
     container_name: xlair-dashboard
     ports:
       - "${HOST_PORT:-3000}:3000"
