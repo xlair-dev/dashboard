@@ -668,6 +668,13 @@ export default function MusicForm({
 																	fileName={chartFiles[key][0].name}
 																	file={chartFiles[key][0]}
 																	previewType="chart"
+																	companionAudio={
+																		audioFile[0]
+																			? { file: audioFile[0] }
+																			: values.audio
+																				? { url: values.audio }
+																				: undefined
+																	}
 																	onRemove={() =>
 																		setChartFiles((current) => ({
 																			...current,
@@ -689,6 +696,13 @@ export default function MusicForm({
 																		}
 																		label={`${label} 譜面`}
 																		preview="chart"
+																		companionAudio={
+																			audioFile[0]
+																				? { file: audioFile[0] }
+																				: values.audio
+																					? { url: values.audio }
+																					: undefined
+																		}
 																	/>
 																	<Button
 																		loading={deletingChart === key}

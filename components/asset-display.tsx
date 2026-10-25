@@ -13,6 +13,7 @@ type AssetDisplayProps = {
 	updatedAt: string | null;
 	label?: string;
 	preview?: "audio" | "chart" | "jacket";
+	companionAudio?: { url?: string | null; file?: File };
 	/** Base file name; the asset extension is added by the download route. */
 	downloadName?: string;
 };
@@ -36,6 +37,7 @@ export function AssetDisplay({
 	label,
 	preview,
 	downloadName,
+	companionAudio,
 }: AssetDisplayProps) {
 	const hasAsset = Boolean(url);
 	const displayLabel = label ?? assetLabels[type];
@@ -75,6 +77,7 @@ export function AssetDisplay({
 							url={url}
 							label={displayLabel}
 							downloadUrl={downloadUrl ?? undefined}
+							companionAudio={companionAudio}
 						/>
 					) : (
 						displayLabel
@@ -92,6 +95,7 @@ export function chartAssetDisplay(
 	sheet: Sheet,
 	label?: string,
 	downloadName?: string,
+	companionAudio?: { url?: string | null; file?: File },
 ) {
 	return (
 		<AssetDisplay
@@ -101,6 +105,7 @@ export function chartAssetDisplay(
 			label={label}
 			downloadName={downloadName}
 			preview="chart"
+			companionAudio={companionAudio}
 		/>
 	);
 }
@@ -111,6 +116,7 @@ export function PendingAssetDisplay({
 	previewUrl,
 	file,
 	previewType,
+	companionAudio,
 	onRemove,
 }: {
 	type: AssetType;
@@ -118,6 +124,7 @@ export function PendingAssetDisplay({
 	previewUrl?: string;
 	file?: File;
 	previewType?: "audio" | "chart" | "jacket";
+	companionAudio?: { url?: string | null; file?: File };
 	onRemove: () => void;
 }) {
 	const label = assetLabels[type];
@@ -144,7 +151,12 @@ export function PendingAssetDisplay({
 						)}
 					</div>
 					{file && previewType ? (
-						<AssetPreview type={previewType} file={file} label={fileName} />
+						<AssetPreview
+							type={previewType}
+							file={file}
+							label={fileName}
+							companionAudio={companionAudio}
+						/>
 					) : (
 						<span className="min-w-0 break-all">{fileName}</span>
 					)}
