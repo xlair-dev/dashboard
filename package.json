@@ -16,7 +16,7 @@
 		"@xlair-dev/chart-viewer": "github:xlair-dev/chart-viewer#e76e42651f234905fbeb933cfbd4743f77476e2b",
 		"@cloudscape-design/components": "^3.0.0",
 		"@cloudscape-design/global-styles": "^1.0.0",
-		"next": "16.4.2",
+		"next": "16.4.3",
 		"react": "19.3.1",
 		"react-dom": "19.3.1"
 	},
