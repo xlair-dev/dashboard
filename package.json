@@ -2,7 +2,7 @@
 	"name": "xlair-dashboard",
 	"version": "0.1.0",
 	"private": true,
-	"packageManager": "pnpm@12.14.0",
+	"packageManager": "pnpm@12.15.0",
 	"scripts": {
 		"dev": "next dev",
 		"build": "next build",
@@ -12,11 +12,11 @@
 		"test": "vitest run"
 	},
 	"dependencies": {
-		"@auth0/nextjs-auth0": "4.32.0",
+		"@auth0/nextjs-auth0": "4.33.0",
 		"@xlair-dev/chart-viewer": "github:xlair-dev/chart-viewer#e76e42651f234905fbeb933cfbd4743f77476e2b",
 		"@cloudscape-design/components": "^3.0.0",
 		"@cloudscape-design/global-styles": "^1.0.0",
-		"next": "16.4.1",
+		"next": "16.4.2",
 		"react": "19.3.1",
 		"react-dom": "19.3.1"
 	},
