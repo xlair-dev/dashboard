@@ -13,7 +13,7 @@
 	},
 	"dependencies": {
 		"@auth0/nextjs-auth0": "4.33.0",
-		"@xlair-dev/chart-viewer": "github:xlair-dev/chart-viewer#00f144685ab242d30f4a68313b3c2da2908e5a69",
+		"@xlair-dev/chart-viewer": "github:xlair-dev/chart-viewer#4bbb856331c2ea64b4ae3e3111e420cbce64617f",
 		"@cloudscape-design/components": "^3.0.0",
 		"@cloudscape-design/global-styles": "^1.0.0",
 		"next": "16.4.3",
