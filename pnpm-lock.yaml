@@ -174,7 +174,7 @@ importers:
         version: 3.0.1401(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@cloudscape-design/global-styles':
         specifier: ^1.0.0
-        version: 1.0.71
+        version: 1.0.72
       '@xlair-dev/chart-viewer':
         specifier: github:xlair-dev/chart-viewer#4bbb856331c2ea64b4ae3e3111e420cbce64617f
         version: https://codeload.github.com/xlair-dev/chart-viewer/tar.gz/4bbb856331c2ea64b4ae3e3111e420cbce64617f(react@19.3.1)
@@ -302,8 +302,8 @@ packages:
     peerDependencies:
       react: '>=16.8.0'
 
-  '@cloudscape-design/global-styles@1.0.71':
-    resolution: {integrity: sha512-dt9ECM4bp8MBoTmCremOX10rim1EKGufp4Tdu/BtScmzzgtjRQZ0fmgIv+JA9RiwIhSUv9qVCnb6Ji2i/gigAg==}
+  '@cloudscape-design/global-styles@1.0.72':
+    resolution: {integrity: sha512-FqKCsIO46AfGsj7zbvfIguHCrFLIM/oeXLWxN89pngi7Uf0sVgy9gE699dqVkGgV93Odj7AEreRjZeq2/b0Q3w==}
 
   '@cloudscape-design/test-utils-core@1.0.93':
     resolution: {integrity: sha512-RPVdlNQmCOaMu60nqbM+mISz5qAU5upHjKDOG6uDVoqQ3+J4chXQhTXPsWyw0JPrhmClUHBs1oWY5d0rcTqddA==}
@@ -1567,7 +1567,7 @@ snapshots:
     transitivePeerDependencies:
       - react-dom
 
-  '@cloudscape-design/global-styles@1.0.71': {}
+  '@cloudscape-design/global-styles@1.0.72': {}
 
   '@cloudscape-design/test-utils-core@1.0.93':
     dependencies:
